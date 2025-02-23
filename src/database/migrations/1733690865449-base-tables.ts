@@ -129,7 +129,7 @@ export class BaseTables1720373216667 implements MigrationInterface {
           },
         ],
         indices: [{
-          name: 'IDX__material_type__external_id',
+          name: 'IDX__manufacturer__external_id',
           columnNames: ['external_id'],
         }],
       }),
