@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MetaController } from './meta.controller';
+import { MetaController } from './meta.controller.js';
 
 describe('MetaController', () => {
   let controller: MetaController;
