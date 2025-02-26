@@ -27,7 +27,7 @@ export class ShortCodesController {
     }
 
     return Promise.all(materialShortCodes.map(async (materialShortCode) => {
-      const shortCode = await this.shortCodeService.GetShortCodeByCode(materialShortCode.shortCodeId);
+      const shortCode = await this.shortCodeService.GetShortCode(materialShortCode.shortCodeId);
 
       return shortCode;
     }));
@@ -53,5 +53,7 @@ export class ShortCodesController {
     });
 
     await this.materialShortCodeService.Create(materialId, shortCode.id);
+
+    return {};
   }
 }
