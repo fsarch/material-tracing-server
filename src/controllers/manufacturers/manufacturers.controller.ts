@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { MaterialTypeCreateDto, MaterialTypeDto } from "../../models/material-type.model.js";
 import { ManufacturerService } from "../../repositories/manufacturer/manufacturer.service.js";
 import { ManufacturerCreateDto, ManufacturerDto } from "../../models/manufacturer.model.js";
 
@@ -29,5 +28,14 @@ export class ManufacturersController {
     const manufacturers = await this.manufacturerService.ListManufacturers();
 
     return manufacturers.map(ManufacturerDto.FromDbo);
+  }
+
+  @Get('/:manufacturerId')
+  public async Get(
+    @Param('manufacturerId') manufacturerId: string,
+  ): Promise<ManufacturerDto> {
+    const manufacturer = await this.manufacturerService.GetManufacturerById(manufacturerId);
+
+    return ManufacturerDto.FromDbo(manufacturer);
   }
 }

@@ -28,4 +28,12 @@ export class ManufacturerService {
   public async ListManufacturers(): Promise<Array<Manufacturer>> {
     return this.manufacturerRepository.find();
   }
+
+  public async GetManufacturerById(id: string): Promise<Manufacturer | null> {
+    return this.manufacturerRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
 }

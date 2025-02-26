@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { MaterialTypeCreateDto, MaterialTypeDto } from "../../models/material-type.model.js";
 import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
@@ -24,5 +24,14 @@ export class MaterialTypesController {
     const materialTypes = await this.materialTypeService.ListMaterialTypes();
 
     return materialTypes.map(MaterialTypeDto.FromDbo);
+  }
+
+  @Get('/:materialTypeId')
+  public async Get(
+    @Param('materialTypeId') materialTypeId: string,
+  ): Promise<MaterialTypeDto> {
+    const materialType = await this.materialTypeService.GetMaterialType(materialTypeId);
+
+    return MaterialTypeDto.FromDbo(materialType);
   }
 }
