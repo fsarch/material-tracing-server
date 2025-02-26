@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { MaterialService } from "../../repositories/material/material.service.js";
 import { MaterialCreateDto, MaterialDto } from "../../models/material.model.js";
@@ -21,6 +21,13 @@ export class MaterialsController {
     const materials = await this.materialService.ListMaterials();
 
     return materials.map(MaterialDto.FromDbo);
+  }
+
+  @Get('/:materialId')
+  public async Get(@Param('materialId') materialId: string) {
+    const material = await this.materialService.GetById(materialId);
+
+    return MaterialDto.FromDbo(material);
   }
 
   @Post()
