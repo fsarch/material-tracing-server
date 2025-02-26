@@ -1,4 +1,4 @@
-import { ConflictException, Controller, NotFoundException, Param, Put } from '@nestjs/common';
+import { ConflictException, Controller, Get, NotFoundException, Param, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
 import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
@@ -6,7 +6,7 @@ import { MaterialShortCodeService } from "../../../repositories/material-short-c
 
 @ApiTags('short-code')
 @Controller({
-  path: 'materials/:materialId/short-codes/:shortCode',
+  path: 'materials/:materialId/short-codes',
   version: '1',
 })
 @ApiBearerAuth()
@@ -17,7 +17,23 @@ export class ShortCodesController {
   ) {
   }
 
-  @Put()
+  @Get()
+  public async ListShortCodes(
+    @Param('materialId') materialId: string,
+  ) {
+    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
+    if (!materialShortCodes.length) {
+      return [];
+    }
+
+    return Promise.all(materialShortCodes.map(async (materialShortCode) => {
+      const shortCode = await this.shortCodeService.GetShortCodeByCode(materialShortCode.shortCodeId);
+
+      return shortCode;
+    }));
+  }
+
+  @Put('/:shortCode')
   public async MapMaterialShortCode(
     @Param('materialId') materialId: string,
     @Param('shortCode') code: string,
