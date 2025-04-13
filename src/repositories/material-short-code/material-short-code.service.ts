@@ -36,4 +36,10 @@ export class MaterialShortCodeService {
       where: { shortCodeId },
     });
   }
+
+  public async DeleteById(id: string): Promise<void> {
+    await this.materialShortCodeRepository.softDelete({
+      id,
+    });
+  }
 }

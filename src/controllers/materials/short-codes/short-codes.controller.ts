@@ -1,4 +1,4 @@
-import { ConflictException, Controller, Get, NotFoundException, Param, Put } from '@nestjs/common';
+import { ConflictException, Controller, Delete, Get, NotFoundException, Param, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
 import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
@@ -53,6 +53,27 @@ export class ShortCodesController {
     });
 
     await this.materialShortCodeService.Create(materialId, shortCode.id);
+
+    return {};
+  }
+
+  @Delete('/:shortCode')
+  public async DeleteMaterialShortCode(
+    @Param('materialId') materialId: string,
+    @Param('shortCode') code: string,
+  ) {
+    const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
+    if (!shortCode) {
+      throw new NotFoundException();
+    }
+
+    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
+    const foundShortCode = materialShortCodes.find(msc => msc.shortCodeId === shortCode.id && msc.materialId === materialId)
+    if (!foundShortCode) {
+      throw new ConflictException();
+    }
+
+    await this.materialShortCodeService.DeleteById(foundShortCode.id);
 
     return {};
   }
