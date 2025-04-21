@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MaterialShortCodesController } from './short-codes.controller.js';
+import { PartShortCodesController } from './short-codes.controller.js';
 
 describe('ShortCodesController', () => {
-  let controller: MaterialShortCodesController;
+  let controller: PartShortCodesController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [MaterialShortCodesController],
+      controllers: [PartShortCodesController],
     }).compile();
 
-    controller = module.get<MaterialShortCodesController>(MaterialShortCodesController);
+    controller = module.get<PartShortCodesController>(PartShortCodesController);
   });
 
   it('should be defined', () => {

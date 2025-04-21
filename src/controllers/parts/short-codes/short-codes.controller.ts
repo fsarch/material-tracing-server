@@ -2,26 +2,26 @@ import { ConflictException, Controller, Delete, Get, NotFoundException, Param, P
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
 import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
-import { MaterialShortCodeService } from "../../../repositories/material-short-code/material-short-code.service.js";
+import { PartShortCodeService } from "../../../repositories/part-short-code/part-short-code.service.js";
 
 @ApiTags('short-code')
 @Controller({
-  path: 'materials/:materialId/short-codes',
+  path: 'parts/:partId/short-codes',
   version: '1',
 })
 @ApiBearerAuth()
-export class MaterialShortCodesController {
+export class PartShortCodesController {
   constructor(
     private readonly shortCodeService: ShortCodeService,
-    private readonly materialShortCodeService: MaterialShortCodeService,
+    private readonly partShortCodeService: PartShortCodeService,
   ) {
   }
 
   @Get()
   public async ListShortCodes(
-    @Param('materialId') materialId: string,
+    @Param('partId') partId: string,
   ) {
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
+    const materialShortCodes = await this.partShortCodeService.ListByPartId(partId);
     if (!materialShortCodes.length) {
       return [];
     }
@@ -35,10 +35,10 @@ export class MaterialShortCodesController {
 
   @Put('/:shortCode')
   public async MapMaterialShortCode(
-    @Param('materialId') materialId: string,
+    @Param('partId') partId: string,
     @Param('shortCode') code: string,
   ) {
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
+    const materialShortCodes = await this.partShortCodeService.ListByPartId(partId);
     if (materialShortCodes.length) {
       throw new ConflictException();
     }
@@ -49,17 +49,17 @@ export class MaterialShortCodesController {
     }
 
     await this.shortCodeService.UpdateShortCode(shortCode.id, {
-      shortCodeTypeId: ShortCodeType.MATERIAL,
+      shortCodeTypeId: ShortCodeType.PART,
     });
 
-    await this.materialShortCodeService.Create(materialId, shortCode.id);
+    await this.partShortCodeService.Create(partId, shortCode.id);
 
     return {};
   }
 
   @Delete('/:shortCode')
   public async DeleteMaterialShortCode(
-    @Param('materialId') materialId: string,
+    @Param('partId') partId: string,
     @Param('shortCode') code: string,
   ) {
     const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
@@ -67,13 +67,13 @@ export class MaterialShortCodesController {
       throw new NotFoundException();
     }
 
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
-    const foundShortCode = materialShortCodes.find(msc => msc.shortCodeId === shortCode.id && msc.materialId === materialId)
+    const materialShortCodes = await this.partShortCodeService.ListByPartId(partId);
+    const foundShortCode = materialShortCodes.find(msc => msc.shortCodeId === shortCode.id && msc.partId === partId)
     if (!foundShortCode) {
       throw new ConflictException();
     }
 
-    await this.materialShortCodeService.DeleteById(foundShortCode.id);
+    await this.partShortCodeService.DeleteById(foundShortCode.id);
 
     return {};
   }
