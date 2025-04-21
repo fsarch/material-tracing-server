@@ -375,6 +375,11 @@ export class BaseTables1720373216667 implements MigrationInterface {
             primaryKeyConstraintName: 'pk__part',
           },
           {
+            name: 'parent_part_id',
+            type: 'uuid',
+            isNullable: true,
+          },
+          {
             name: 'part_type_id',
             type: 'uuid',
             isNullable: false,
@@ -391,6 +396,17 @@ export class BaseTables1720373216667 implements MigrationInterface {
             length: '256',
             isNullable: true,
           },
+          {
+            name: 'creation_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: false,
+            default: 'now()',
+          },
+          {
+            name: 'deletion_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: true,
+          },
         ],
         indices: [{
           name: 'IDX__part__part_type_id',
@@ -398,6 +414,9 @@ export class BaseTables1720373216667 implements MigrationInterface {
         }, {
           name: 'IDX__part__external_id',
           columnNames: ['external_id'],
+        }, {
+          name: 'IDX__part__parent_part_id',
+          columnNames: ['parent_part_id'],
         }],
         foreignKeys: [{
           name: 'fk__part__part_type_id',

@@ -12,6 +12,7 @@ import { ShortCode } from "./database/entities/short_code.entity.js";
 import { ShortCodeType } from "./database/entities/short_code_type.entity.js";
 import { Manufacturer } from "./database/entities/manufacturer.entity.js";
 import { PartType } from "./database/entities/part_type.entity.js";
+import { Part } from "./database/entities/part.entity.js";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PartType } from "./database/entities/part_type.entity.js";
           ShortCode,
           ShortCodeType,
           PartType,
+          Part,
         ],
         migrations: [
           BaseTables1720373216667

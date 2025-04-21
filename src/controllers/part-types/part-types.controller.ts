@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PartTypeCreateDto, PartTypeDto } from "../../models/part-type.model.js";
 import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
@@ -32,6 +32,9 @@ export class PartTypesController {
     @Param('partTypeId') partTypeId: string,
   ): Promise<PartTypeDto> {
     const partType = await this.partTypeService.GetPartType(partTypeId);
+    if (!partType) {
+      throw new NotFoundException();
+    }
 
     return PartTypeDto.FromDbo(partType);
   }

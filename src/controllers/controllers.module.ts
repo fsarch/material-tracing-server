@@ -5,8 +5,9 @@ import { ManufacturersModule } from './manufacturers/manufacturers.module.js';
 import { ShortCodesModule } from './short-codes/short-codes.module.js';
 import { MetaModule } from './meta/meta.module.js';
 import { PartTypesModule } from './part-types/part-types.module.js';
+import { PartsModule } from './parts/parts.module.js';
 
 @Module({
-  imports: [MaterialsModule, MaterialTypesModule, ManufacturersModule, ShortCodesModule, MetaModule, PartTypesModule]
+  imports: [MaterialsModule, MaterialTypesModule, ManufacturersModule, ShortCodesModule, MetaModule, PartTypesModule, PartsModule]
 })
 export class ControllersModule {}
