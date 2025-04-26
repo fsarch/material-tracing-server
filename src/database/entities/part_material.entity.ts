@@ -7,33 +7,26 @@ import {
 } from 'typeorm';
 
 @Entity({
-  name: 'part',
+  name: 'part_material',
 })
-export class Part {
+export class PartMaterial {
   @PrimaryGeneratedColumn('uuid', {
-    primaryKeyConstraintName: 'pk__part',
+    primaryKeyConstraintName: 'pk__part_material',
   })
   id: string;
 
   @Column({
-    name: 'name',
-    length: '512',
-    nullable: false,
-  })
-  name: string;
-
-  @Column({
-    name: 'part_type_id',
+    name: 'part_id',
     type: 'uuid',
   })
-  partTypeId: string;
+  partId: string;
 
   @Column({
-    name: 'external_id',
-    type: 'varchar',
-    length: '256',
+    name: 'material_id',
+    type: 'uuid',
+    nullable: false,
   })
-  externalId: string;
+  materialId: string;
 
   @CreateDateColumn({
     name: 'creation_time',

@@ -375,11 +375,6 @@ export class BaseTables1720373216667 implements MigrationInterface {
             primaryKeyConstraintName: 'pk__part',
           },
           {
-            name: 'parent_part_id',
-            type: 'uuid',
-            isNullable: true,
-          },
-          {
             name: 'part_type_id',
             type: 'uuid',
             isNullable: false,
@@ -414,9 +409,6 @@ export class BaseTables1720373216667 implements MigrationInterface {
         }, {
           name: 'IDX__part__external_id',
           columnNames: ['external_id'],
-        }, {
-          name: 'IDX__part__parent_part_id',
-          columnNames: ['parent_part_id'],
         }],
         foreignKeys: [{
           name: 'fk__part__part_type_id',
@@ -487,6 +479,139 @@ export class BaseTables1720373216667 implements MigrationInterface {
           onUpdate: 'NO ACTION',
           onDelete: 'NO ACTION',
           columnNames: ['part_id'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'part',
+        }],
+      }),
+    );
+    // endregion
+
+    // region PartMaterial
+    await queryRunner.createTable(
+      new Table({
+        name: 'part_material',
+        columns: [
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            primaryKeyConstraintName: 'pk__part_material',
+          },
+          {
+            name: 'part_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
+            name: 'material_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
+            name: 'creation_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: false,
+            default: 'now()',
+          },
+          {
+            name: 'deletion_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: true,
+          },
+        ],
+        indices: [{
+          name: 'IDX__part_material__part_id',
+          columnNames: ['part_id'],
+        }, {
+          name: 'IDX__part_material__material_id',
+          columnNames: ['material_id'],
+        }, {
+          name: 'UQ__part_material__material_id__part_id',
+          columnNames: ['material_id', 'part_id'],
+          isUnique: true,
+          where: 'deletion_time IS NULL',
+        }],
+        foreignKeys: [{
+          name: 'fk__part_material__part_id',
+          onUpdate: 'NO ACTION',
+          onDelete: 'NO ACTION',
+          columnNames: ['part_id'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'part',
+        }, {
+          name: 'fk__part_material__material_id',
+          onUpdate: 'NO ACTION',
+          onDelete: 'NO ACTION',
+          columnNames: ['material_id'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'material',
+        }],
+      }),
+    );
+    // endregion
+
+    // region PartChildren
+    await queryRunner.createTable(
+      new Table({
+        name: 'part_children',
+        columns: [
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            primaryKeyConstraintName: 'pk__part_part',
+          },
+          {
+            name: 'part_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
+            name: 'child_part_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
+            name: 'amount',
+            type: 'integer',
+            isNullable: false,
+          },
+          {
+            name: 'creation_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: false,
+            default: 'now()',
+          },
+          {
+            name: 'deletion_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: true,
+          },
+        ],
+        indices: [{
+          name: 'IDX__part_children__part_id',
+          columnNames: ['part_id'],
+        }, {
+          name: 'IDX__part_children__child_part_id',
+          columnNames: ['child_part_id'],
+        }, {
+          name: 'UQ__part_children__part_id__child_part_id',
+          columnNames: ['part_id', 'child_part_id'],
+          isUnique: true,
+          where: 'deletion_time IS NULL',
+        }],
+        foreignKeys: [{
+          name: 'fk__part_children__part_id',
+          onUpdate: 'NO ACTION',
+          onDelete: 'NO ACTION',
+          columnNames: ['part_id'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'part',
+        }, {
+          name: 'fk__part_children__child_part_id',
+          onUpdate: 'NO ACTION',
+          onDelete: 'NO ACTION',
+          columnNames: ['child_part_id'],
           referencedColumnNames: ['id'],
           referencedTableName: 'part',
         }],
