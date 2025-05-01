@@ -38,7 +38,7 @@ export class PartMaterialService {
 
   public async ListByPart(partId: string): Promise<Array<Material>> {
     const existingPartMaterial = await this.partMaterialRepository.createQueryBuilder('pm')
-      .leftJoinAndSelect(Material, 'mat')
+      .leftJoinAndSelect(Material, 'mat', 'pm.material_id = mat.id')
       .select('mat.*')
       .where({
         partId: partId,
