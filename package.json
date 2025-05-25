@@ -10,7 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "nest start --watch | pino-pretty",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -41,7 +41,10 @@
     "js-yaml": "^4.1.0",
     "nanoid": "^5.1.2",
     "pg": "^8.12.0",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
     "reflect-metadata": "^0.2.0",
+    "serialize-error": "^12.0.0",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
