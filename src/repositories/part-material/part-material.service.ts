@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from "typeorm";
 import { PartMaterial } from "../../database/entities/part_material.entity.js";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -6,6 +6,8 @@ import { Material } from "../../database/entities/material.entity.js";
 
 @Injectable()
 export class PartMaterialService {
+  private readonly logger = new Logger(PartMaterialService.name);
+
   constructor(
     @InjectRepository(PartMaterial)
     private readonly partMaterialRepository: Repository<PartMaterial>,
@@ -18,6 +20,11 @@ export class PartMaterialService {
       materialId,
     });
     if (existingPartMaterial) {
+      this.logger.debug('found existing part material with {id}', {
+        id: existingPartMaterial.id,
+        partId: existingPartMaterial.partId,
+        materialId: existingPartMaterial.materialId,
+      });
       return {
         id: existingPartMaterial.id,
       };
