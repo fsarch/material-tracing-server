@@ -18,6 +18,7 @@ export class PartChildren {
   @Column({
     name: 'part_id',
     type: 'uuid',
+    nullable: false,
   })
   partId: string;
 
