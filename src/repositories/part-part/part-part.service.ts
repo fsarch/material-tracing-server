@@ -41,6 +41,15 @@ export class PartPartService {
     };
   }
 
+  public async GetById(partId: string, childPartId: string): Promise<PartChildren> {
+    return await this.partChildrenRepository.findOne({
+      where: {
+        partId,
+        childPartId,
+      },
+    });
+  }
+
   public async List(partId: string): Promise<Array<Part>> {
     const existingPartMaterial = await this.partChildrenRepository.createQueryBuilder('pc')
       .where({
@@ -52,5 +61,11 @@ export class PartPartService {
       .execute();
 
     return existingPartMaterial;
+  }
+
+  public async DeleteById(partChildrenId: string) {
+    await this.partChildrenRepository.softDelete({
+      id: partChildrenId,
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Part } from "../database/entities/part.entity.js";
+import { IsOptional } from "class-validator";
 
 export class PartCreateDto {
   @ApiProperty()
@@ -13,6 +14,20 @@ export class PartCreateDto {
 
   @ApiProperty()
   amount: number;
+}
+
+export class PartPatchDto {
+  @ApiProperty()
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  externalId?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  amount?: number;
 }
 
 export class PartDto {

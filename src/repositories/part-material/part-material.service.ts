@@ -43,6 +43,15 @@ export class PartMaterialService {
     };
   }
 
+  public async GetByIds(partId: string, materialId: string): Promise<PartMaterial> {
+    return this.partMaterialRepository.findOne({
+      where: {
+        partId,
+        materialId,
+      },
+    });
+  }
+
   public async ListByPart(partId: string): Promise<Array<Material>> {
     const existingPartMaterial = await this.partMaterialRepository.createQueryBuilder('pm')
       .leftJoinAndSelect(Material, 'mat', 'pm.material_id = mat.id')
@@ -53,5 +62,11 @@ export class PartMaterialService {
       .execute();
 
     return existingPartMaterial;
+  }
+
+  public async DeleteById(partMaterialId: string): Promise<void> {
+    await this.partMaterialRepository.softDelete({
+      id: partMaterialId,
+    });
   }
 }

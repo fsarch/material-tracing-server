@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PartService } from "../../../repositories/part/part.service.js";
 import { PartPartCreateDto } from "../../../models/part-part.model.js";
@@ -45,5 +45,19 @@ export class PartsController {
     const parts = await this.partPartService.List(partId);
 
     return parts;
+  }
+
+  @Delete('/:childPartId')
+  public async Delete(
+    @Param('partId') partId: string,
+    @Param('childPartId') childPartId: string,
+  ) {
+    const childPart = await this.partPartService.GetById(partId, childPartId);
+
+    if (!childPart) {
+      throw new NotFoundException();
+    }
+
+    return await this.partPartService.DeleteById(childPart.id);
   }
 }

@@ -1,4 +1,4 @@
-import { ConflictException, Controller, Get, NotFoundException, Param, Put } from '@nestjs/common';
+import { ConflictException, Controller, Delete, Get, NotFoundException, Param, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PartService } from "../../../repositories/part/part.service.js";
 import { MaterialService } from "../../../repositories/material/material.service.js";
@@ -43,5 +43,19 @@ export class MaterialsController {
     @Param('partId') partId: string,
   ) {
     return await this.partMaterialService.ListByPart(partId);
+  }
+
+  @Delete('/:materialId')
+  public async Delete(
+    @Param('partId') partId: string,
+    @Param('materialId') materialId: string,
+  ) {
+    const partMaterial = await this.partMaterialService.GetByIds(partId, materialId);
+
+    if (!partMaterial) {
+      throw new NotFoundException();
+    }
+
+    return await this.partMaterialService.DeleteById(partMaterial.id);
   }
 }

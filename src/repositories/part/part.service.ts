@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Part } from "../../database/entities/part.entity.js";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { PartCreateDto } from "../../models/part.model.js";
+import { PartCreateDto, PartPatchDto } from "../../models/part.model.js";
 
 @Injectable()
 export class PartService {
@@ -28,6 +28,26 @@ export class PartService {
     };
   }
 
+  public async UpdatePart(partId: string, patchDto: PartPatchDto): Promise<void> {
+    const part = await this.partRepository.findOneOrFail({
+      where: { id: partId },
+    });
+
+    if (patchDto.name !== undefined) {
+      part.name = patchDto.name;
+    }
+
+    if (patchDto.amount !== undefined) {
+      part.amount = patchDto.amount;
+    }
+
+    if (patchDto.externalId !== undefined) {
+      part.externalId = patchDto.externalId;
+    }
+
+    await this.partRepository.save(part);
+  }
+
   public async ListParts(): Promise<Array<Part>> {
     return this.partRepository.find();
   }
@@ -35,6 +55,12 @@ export class PartService {
   public async GetById(id: string): Promise<Part | null> {
     return this.partRepository.findOne({
       where: { id },
+    });
+  }
+
+  public async DeletePart(id: string): Promise<void> {
+    await this.partRepository.softDelete({
+      id,
     });
   }
 }
