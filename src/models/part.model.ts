@@ -10,6 +10,9 @@ export class PartCreateDto {
 
   @ApiProperty()
   partTypeId: string;
+
+  @ApiProperty()
+  amount: number;
 }
 
 export class PartDto {
@@ -20,6 +23,7 @@ export class PartDto {
     partDto.name = part.name;
     partDto.externalId = part.externalId;
     partDto.partTypeId = part.partTypeId;
+    partDto.amount = part.amount;
 
     return partDto;
   }
@@ -35,4 +39,7 @@ export class PartDto {
 
   @ApiProperty()
   partTypeId: string;
+
+  @ApiProperty()
+  amount: number;
 }

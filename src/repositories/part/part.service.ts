@@ -18,6 +18,7 @@ export class PartService {
       name: createDto.name,
       partTypeId: createDto.partTypeId,
       externalId: createDto.externalId,
+      amount: createDto.amount,
     });
 
     const savedMaterial = await this.partRepository.save(createdMaterial);

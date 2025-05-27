@@ -16,6 +16,7 @@ import { Part } from "./database/entities/part.entity.js";
 import { PartShortCode } from "./database/entities/part_short_code.entity.js";
 import { PartMaterial } from "./database/entities/part_material.entity.js";
 import { PartChildren } from "./database/entities/part_children.entity.js";
+import { PartAmount1748372988976 } from "./database/migrations/1748372988976-part-amount.js";
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { PartChildren } from "./database/entities/part_children.entity.js";
           PartChildren,
         ],
         migrations: [
-          BaseTables1720373216667
+          BaseTables1720373216667,
+          PartAmount1748372988976,
         ],
       },
     }),

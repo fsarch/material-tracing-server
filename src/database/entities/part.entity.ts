@@ -29,6 +29,12 @@ export class Part {
   partTypeId: string;
 
   @Column({
+    name: 'amount',
+    type: 'integer',
+  })
+  amount: number;
+
+  @Column({
     name: 'external_id',
     type: 'varchar',
     length: '256',
