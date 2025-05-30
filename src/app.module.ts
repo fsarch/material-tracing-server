@@ -17,6 +17,7 @@ import { PartShortCode } from "./database/entities/part_short_code.entity.js";
 import { PartMaterial } from "./database/entities/part_material.entity.js";
 import { PartChildren } from "./database/entities/part_children.entity.js";
 import { PartAmount1748372988976 } from "./database/migrations/1748372988976-part-amount.js";
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PartAmount1748372988976 } from "./database/migrations/1748372988976-par
         ],
       },
     }),
+    EventEmitterModule.forRoot(),
     ControllersModule,
     RepositoriesModule,
   ],

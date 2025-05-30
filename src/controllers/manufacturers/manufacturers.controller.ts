@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ManufacturerService } from "../../repositories/manufacturer/manufacturer.service.js";
 import { ManufacturerCreateDto, ManufacturerDto } from "../../models/manufacturer.model.js";
@@ -37,5 +37,12 @@ export class ManufacturersController {
     const manufacturer = await this.manufacturerService.GetManufacturerById(manufacturerId);
 
     return ManufacturerDto.FromDbo(manufacturer);
+  }
+
+  @Delete('/:manufacturerId')
+  public async Delete(
+    @Param('manufacturerId') manufacturerId: string,
+  ): Promise<void> {
+    await this.manufacturerService.DeleteManufacturer(manufacturerId);
   }
 }

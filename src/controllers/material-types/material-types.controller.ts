@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { MaterialTypeCreateDto, MaterialTypeDto } from "../../models/material-type.model.js";
 import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
+import { OnEvent } from "@nestjs/event-emitter";
+import { EEvent } from "../../constants/event.enum.js";
 
 @ApiTags('material-type')
 @Controller({
@@ -33,5 +35,21 @@ export class MaterialTypesController {
     const materialType = await this.materialTypeService.GetMaterialType(materialTypeId);
 
     return MaterialTypeDto.FromDbo(materialType);
+  }
+
+  @Delete('/:materialTypeId')
+  public async Delete(
+    @Param('materialTypeId') materialTypeId: string,
+  ): Promise<void> {
+    await this.materialTypeService.DeleteById(materialTypeId);
+  }
+
+  @OnEvent(EEvent.DELETE_MANUFACTURER)
+  public async DeleteByManufacturer(payload: { id: string, deletionTime: string }) {
+    const materialTypes = await this.materialTypeService.ListByManufacturer(payload.id);
+
+    for (let materialType of materialTypes) {
+      await this.materialTypeService.DeleteById(materialType.id, payload.deletionTime);
+    }
   }
 }

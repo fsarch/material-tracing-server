@@ -1,8 +1,10 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { MaterialService } from "../../repositories/material/material.service.js";
 import { MaterialCreateDto, MaterialDto } from "../../models/material.model.js";
 import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
+import { OnEvent } from "@nestjs/event-emitter";
+import { EEvent } from "../../constants/event.enum.js";
 
 @ApiTags('material')
 @Controller({
@@ -45,5 +47,19 @@ export class MaterialsController {
       name: materialCreateDto.name
         || `${materialType.name} (${new Intl.DateTimeFormat('de', { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Berlin", }).format(new Date())})`,
     });
+  }
+
+  @Delete('/:materialId')
+  public async Delete(@Param('materialId') materialId: string) {
+    await this.materialService.DeleteById(materialId);
+  }
+
+  @OnEvent(EEvent.DELETE_MATERIAL_TYPE)
+  public async DeleteByManufacturer(payload: { id: string, deletionTime: string }) {
+    const materials = await this.materialService.ListByMaterialType(payload.id);
+
+    for (let material of materials) {
+      await this.materialService.DeleteById(material.id, payload.deletionTime);
+    }
   }
 }
