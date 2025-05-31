@@ -9,6 +9,18 @@ export class PartTypeCreateDto {
   externalId: string;
 }
 
+export class PartTypePatchDto {
+  @ApiProperty({
+    required: false,
+  })
+  name?: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  externalId?: string;
+}
+
 export class PartTypeDto {
   public static FromDbo(partType: PartType): PartTypeDto {
     const partTypeDto = new PartTypeDto();

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { IsNull, Repository } from "typeorm";
-import { PartTypeCreateDto, PartTypeDto } from "../../models/part-type.model.js";
+import { PartTypeCreateDto, PartTypeDto, PartTypePatchDto } from "../../models/part-type.model.js";
 import { PartType } from "../../database/entities/part_type.entity.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
@@ -39,6 +39,26 @@ export class PartTypeService {
         id,
       },
     });
+  }
+
+  public async UpdatePartType(id: string, partTypePatchDto: PartTypePatchDto): Promise<PartType | null> {
+    const partType = await this.partTypeRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (partTypePatchDto.name !== undefined) {
+      partType.name = partTypePatchDto.name;
+    }
+
+    if (partTypePatchDto.externalId !== undefined) {
+      partType.externalId = partTypePatchDto.externalId;
+    }
+
+    await this.partTypeRepository.save(partType);
+
+    return partType;
   }
 
   public async Delete(id: string, deletionTime = new Date().toISOString()): Promise<void> {
