@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Part } from "../../database/entities/part.entity.js";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PartCreateDto, PartPatchDto } from "../../models/part.model.js";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { EEvent } from "../../constants/event.enum.js";
 
 @Injectable()
 export class PartService {
   constructor(
     @InjectRepository(Part)
     private readonly partRepository: Repository<Part>,
+    private readonly eventEmitter: EventEmitter2,
   ) {
   }
 
@@ -52,15 +55,31 @@ export class PartService {
     return this.partRepository.find();
   }
 
+  public async ListPartsByPartType(partTypeId: string): Promise<Array<Part>> {
+    return this.partRepository.find({
+      where: {
+        partTypeId,
+      },
+    });
+  }
+
   public async GetById(id: string): Promise<Part | null> {
     return this.partRepository.findOne({
       where: { id },
     });
   }
 
-  public async DeletePart(id: string): Promise<void> {
-    await this.partRepository.softDelete({
+  public async DeletePart(id: string, deletionTime = new Date().toISOString()): Promise<void> {
+    await this.partRepository.update({
       id,
+      deletionTime: IsNull(),
+    }, {
+      deletionTime,
+    });
+
+    this.eventEmitter.emit(EEvent.DELETE_PART, {
+      id,
+      deletionTime,
     });
   }
 }

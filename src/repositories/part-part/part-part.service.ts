@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { PartChildren } from "../../database/entities/part_children.entity.js";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { Part } from "../../database/entities/part.entity.js";
 import { Material } from "../../database/entities/material.entity.js";
 
@@ -66,6 +66,15 @@ export class PartPartService {
   public async DeleteById(partChildrenId: string) {
     await this.partChildrenRepository.softDelete({
       id: partChildrenId,
+    });
+  }
+
+  public async DeleteByPartId(partId: string, deletionTime = new Date().toISOString()) {
+    await this.partChildrenRepository.update({
+      partId,
+      deletionTime: IsNull(),
+    }, {
+      deletionTime,
     });
   }
 }

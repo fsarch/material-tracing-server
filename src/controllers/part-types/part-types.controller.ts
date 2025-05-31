@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PartTypeCreateDto, PartTypeDto } from "../../models/part-type.model.js";
 import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
@@ -37,5 +37,12 @@ export class PartTypesController {
     }
 
     return PartTypeDto.FromDbo(partType);
+  }
+
+  @Delete('/:partTypeId')
+  public async Delete(
+    @Param('partTypeId') partTypeId: string,
+  ): Promise<void> {
+    await this.partTypeService.Delete(partTypeId);
   }
 }

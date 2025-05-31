@@ -3,6 +3,8 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
 import { PartService } from "../../repositories/part/part.service.js";
 import { PartCreateDto, PartDto, PartPatchDto } from "../../models/part.model.js";
+import { OnEvent } from "@nestjs/event-emitter";
+import { EEvent } from "../../constants/event.enum.js";
 
 @ApiTags('parts')
 @Controller({
@@ -76,5 +78,13 @@ export class PartsController {
     }
 
     return await this.partService.DeletePart(partId);
+  }
+
+  @OnEvent(EEvent.DELETE_PART_TYPE)
+  public async DeletePartsByPartType(payload: { id: string, datetime: string }) {
+    const parts = await this.partService.ListPartsByPartType(payload.id);
+    for (let part of parts) {
+      await this.partService.DeletePart(part.id);
+    }
   }
 }
