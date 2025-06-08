@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
 import { PartService } from "../../repositories/part/part.service.js";
 import { PartCreateDto, PartDto, PartPatchDto } from "../../models/part.model.js";
@@ -27,13 +27,29 @@ export class PartsController {
   }
 
   @Get('/:partId')
-  public async Get(@Param('partId') partId: string) {
+  @ApiQuery({
+    name: 'include',
+    isArray: true,
+    type: String,
+    required: false,
+  })
+  public async Get(
+    @Param('partId') partId: string,
+    @Query('include') include: Array<string> = [],
+  ) {
     const part = await this.partService.GetById(partId);
     if (!part) {
       throw new NotFoundException();
     }
 
-    return PartDto.FromDbo(part);
+    const dto = PartDto.FromDbo(part);
+
+    if (include.includes('availableAmount')) {
+      const availableAmount = await this.partService.GetAvailableAmount(partId);
+      dto.availableAmount = availableAmount;
+    }
+
+    return dto;
   }
 
   @Post()

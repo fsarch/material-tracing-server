@@ -5,12 +5,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { PartCreateDto, PartPatchDto } from "../../models/part.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
+import { PartChildren } from "../../database/entities/part_children.entity.js";
 
 @Injectable()
 export class PartService {
   constructor(
     @InjectRepository(Part)
     private readonly partRepository: Repository<Part>,
+    @InjectRepository(PartChildren)
+    private readonly partChildrenRepository: Repository<PartChildren>,
     private readonly eventEmitter: EventEmitter2,
   ) {
   }
@@ -61,6 +64,21 @@ export class PartService {
         partTypeId,
       },
     });
+  }
+
+  public async GetAvailableAmount(id: string): Promise<number> {
+    const totalAmount = (await this.partRepository.findOneOrFail({
+      where: { id },
+      select: { amount: true },
+    })).amount;
+
+    const childrenPartAmount = await this.partChildrenRepository.sum('amount', {
+      childPartId: id,
+    });
+
+    console.log('totalAmount', totalAmount, childrenPartAmount);
+
+    return totalAmount - childrenPartAmount;
   }
 
   public async GetById(id: string): Promise<Part | null> {

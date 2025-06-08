@@ -57,4 +57,9 @@ export class PartDto {
 
   @ApiProperty()
   amount: number;
+
+  @ApiProperty({
+    required: false,
+  })
+  availableAmount?: number;
 }

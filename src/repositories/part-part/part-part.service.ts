@@ -56,7 +56,6 @@ export class PartPartService {
         partId: partId,
       })
       .leftJoinAndSelect(Part, 'pt', 'pc.child_part_id = pt.id')
-      // .where('pt.id = pc.child_part_id')
       .select('pt.id', 'id')
       .addSelect('pt.name', 'name')
       .addSelect('pc.amount', 'amount')
