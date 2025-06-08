@@ -3,6 +3,8 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
 import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
 import { MaterialShortCodeService } from "../../../repositories/material-short-code/material-short-code.service.js";
+import { OnEvent } from "@nestjs/event-emitter";
+import { EEvent } from "../../../constants/event.enum.js";
 
 @ApiTags('short-code')
 @Controller({
@@ -74,7 +76,22 @@ export class MaterialShortCodesController {
     }
 
     await this.materialShortCodeService.DeleteById(foundShortCode.id);
+    await this.shortCodeService.UpdateShortCode(shortCode.id, {
+      shortCodeTypeId: null,
+    });
 
     return {};
+  }
+
+  @OnEvent(EEvent.DELETE_MATERIAL)
+  @OnEvent(EEvent.CHECKOUT_MATERIAL)
+  public async DeleteByMaterial(payload: { id: string }) {
+    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(payload.id);
+
+    for (let materialShortCode of materialShortCodes) {
+      const shortCode = await this.shortCodeService.GetShortCode(materialShortCode.shortCodeId);
+
+      await this.DeleteMaterialShortCode(payload.id, shortCode.code);
+    }
   }
 }

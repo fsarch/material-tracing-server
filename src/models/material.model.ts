@@ -24,6 +24,8 @@ export class MaterialDto {
     materialDto.externalId = material.externalId;
     materialDto.materialTypeId = material.materialTypeId;
     materialDto.imageRef = material.imageRef;
+    materialDto.creationTime = material.creationTime;
+    materialDto.checkoutTime = material.checkoutTime;
 
     return materialDto;
   }
@@ -42,4 +44,10 @@ export class MaterialDto {
 
   @ApiProperty()
   imageRef: string;
+
+  @ApiProperty()
+  creationTime: Date;
+
+  @ApiProperty()
+  checkoutTime?: Date;
 }

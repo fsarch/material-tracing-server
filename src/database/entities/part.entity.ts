@@ -50,4 +50,10 @@ export class Part {
     name: 'deletion_time',
   })
   deletionTime: Date;
+
+  @Column({
+    name: 'checkout_time',
+    type: 'timestamp',
+  })
+  checkoutTime: Date | null = null;
 }

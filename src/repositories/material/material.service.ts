@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Material } from "../../database/entities/material.entity.js";
 import { IsNull, Repository } from "typeorm";
@@ -44,6 +44,23 @@ export class MaterialService {
   public async GetById(id: string): Promise<Material | null> {
     return this.materialRepository.findOne({
       where: { id },
+    });
+  }
+
+  public async CheckoutMaterial(id: string): Promise<void> {
+    const material = await this.GetById(id);
+    if (!material) {
+      throw new NotFoundException("Not Found");
+    }
+
+    const checkoutTime = new Date();
+    material.checkoutTime = checkoutTime;
+
+    await this.materialRepository.save(material);
+
+    this.eventEmitter.emit(EEvent.CHECKOUT_MATERIAL, {
+      id,
+      checkoutTime: checkoutTime.toISOString(),
     });
   }
 

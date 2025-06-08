@@ -18,6 +18,7 @@ import { PartMaterial } from "./database/entities/part_material.entity.js";
 import { PartChildren } from "./database/entities/part_children.entity.js";
 import { PartAmount1748372988976 } from "./database/migrations/1748372988976-part-amount.js";
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { CheckoutTime1749376805136 } from "./database/migrations/1749376805136-checkout-time.js";
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         migrations: [
           BaseTables1720373216667,
           PartAmount1748372988976,
+          CheckoutTime1749376805136,
         ],
       },
     }),

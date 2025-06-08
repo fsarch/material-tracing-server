@@ -54,6 +54,11 @@ export class MaterialsController {
     await this.materialService.DeleteById(materialId);
   }
 
+  @Post('/:materialId/_actions/checkout')
+  public async Checkout(@Param('materialId') materialId: string) {
+    await this.materialService.CheckoutMaterial(materialId);
+  }
+
   @OnEvent(EEvent.DELETE_MATERIAL_TYPE)
   public async DeleteByManufacturer(payload: { id: string, deletionTime: string }) {
     const materials = await this.materialService.ListByMaterialType(payload.id);
