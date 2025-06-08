@@ -25,6 +25,10 @@ export class PartsController {
     @Param('shortCode') code: string,
   ) {
     const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
+    if (!shortCode) {
+      return new NotFoundException();
+    }
+
     if (shortCode.shortCodeTypeId !== ShortCodeType.PART) {
       throw new NotFoundException();
     }
