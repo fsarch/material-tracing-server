@@ -9,6 +9,10 @@ import { ShortCodeType } from "../../constants/short-code-type.enum.js";
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
 
+export type TListShortCodeOptions = {
+  shortCodeTypeId: ShortCodeType;
+};
+
 @Injectable()
 export class ShortCodeService {
   constructor(
@@ -31,8 +35,21 @@ export class ShortCodeService {
     };
   }
 
-  public async ListShortCodes(): Promise<Array<ShortCode>> {
-    return this.shortCodeRepository.find();
+  public async ListShortCodes(selectOptions: TListShortCodeOptions): Promise<Array<ShortCode>> {
+    const where: {
+      shortCodeTypeId?: string
+    } = {};
+
+    if (selectOptions.shortCodeTypeId) {
+      where.shortCodeTypeId = selectOptions.shortCodeTypeId;
+    }
+
+    return this.shortCodeRepository.find({
+      where,
+      order: {
+        creationTime: "DESC",
+      },
+    });
   }
 
   public async GetShortCode(id: string): Promise<ShortCode | null> {

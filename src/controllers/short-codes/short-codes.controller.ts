@@ -1,7 +1,8 @@
-import { Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, NotFoundException, Param, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../repositories/short-code/short-code.service.js";
 import { ShortCodeDto } from "../../models/short-code.model.js";
+import { ShortCodeType } from "../../constants/short-code-type.enum.js";
 
 @ApiTags('short-code')
 @Controller({
@@ -21,8 +22,18 @@ export class ShortCodesController {
   }
 
   @Get()
-  public async ListShortCodes() {
-    const shortCodes = await this.shortCodeService.ListShortCodes();
+  @ApiQuery({
+    name: 'shortCodeTypeId',
+    required: false,
+    enum: ShortCodeType,
+    enumName: 'ShortCodeType',
+  })
+  public async ListShortCodes(
+    @Query('shortCodeTypeId') shortCodeTypeId?: ShortCodeType,
+  ) {
+    const shortCodes = await this.shortCodeService.ListShortCodes({
+      shortCodeTypeId,
+    });
 
     return shortCodes.map(ShortCodeDto.FromDbo);
   }

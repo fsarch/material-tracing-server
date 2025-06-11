@@ -16,6 +16,7 @@ export class ShortCodeDto {
     shortCodeDto.id = shortCode.id;
     shortCodeDto.code = shortCode.code;
     shortCodeDto.shortCodeTypeId = shortCode.shortCodeTypeId;
+    shortCodeDto.creationTime = shortCode.creationTime.toISOString();
 
     return shortCodeDto;
   }
@@ -28,4 +29,7 @@ export class ShortCodeDto {
 
   @ApiProperty()
   shortCodeTypeId: string;
+
+  @ApiProperty()
+  creationTime: string;
 }

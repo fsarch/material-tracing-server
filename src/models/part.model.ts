@@ -39,6 +39,7 @@ export class PartDto {
     partDto.externalId = part.externalId;
     partDto.partTypeId = part.partTypeId;
     partDto.amount = part.amount;
+    partDto.creationTime = part.creationTime.toISOString();
 
     return partDto;
   }
@@ -62,4 +63,7 @@ export class PartDto {
     required: false,
   })
   availableAmount?: number;
+
+  @ApiProperty()
+  creationTime: string;
 }
