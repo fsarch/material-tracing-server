@@ -91,4 +91,64 @@ export class ActionService {
       id: partId,
     }, options);
   }
+
+  public async executePartTypeAction(actionId: string, partTypeId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+    const action = await this.getCustomAction(actionId);
+
+    if (!action.resources.includes('part_type')) {
+      throw new NotFoundException();
+    }
+
+    return this.executeAction(action, {
+      id: partTypeId,
+    }, options);
+  }
+
+  public async executeMaterialAction(actionId: string, materialId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+    const action = await this.getCustomAction(actionId);
+
+    if (!action.resources.includes('material')) {
+      throw new NotFoundException();
+    }
+
+    return this.executeAction(action, {
+      id: materialId,
+    }, options);
+  }
+
+  public async executeMaterialTypeAction(actionId: string, materialTypeId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+    const action = await this.getCustomAction(actionId);
+
+    if (!action.resources.includes('material_type')) {
+      throw new NotFoundException();
+    }
+
+    return this.executeAction(action, {
+      id: materialTypeId,
+    }, options);
+  }
+
+  public async executeShortCodeAction(actionId: string, shortCodeId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+    const action = await this.getCustomAction(actionId);
+
+    if (!action.resources.includes('short_code')) {
+      throw new NotFoundException();
+    }
+
+    return this.executeAction(action, {
+      id: shortCodeId,
+    }, options);
+  }
+
+  public async executeManufacturerAction(actionId: string, manufacturerId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+    const action = await this.getCustomAction(actionId);
+
+    if (!action.resources.includes('manufacturer')) {
+      throw new NotFoundException();
+    }
+
+    return this.executeAction(action, {
+      id: manufacturerId,
+    }, options);
+  }
 }
