@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ConfigService } from "@nestjs/config";
+import { ActionService } from "../../repositories/actions/action.service.js";
 
 @ApiTags('.meta')
 @Controller({
@@ -11,6 +12,7 @@ import { ConfigService } from "@nestjs/config";
 export class MetaController {
   constructor(
     private readonly configService: ConfigService,
+    private readonly actionsService: ActionService,
   ) {
   }
 
@@ -22,7 +24,8 @@ export class MetaController {
       imageServer: {
         adminUrl: imageConfig.admin_url,
         userUrl: imageConfig.user_url,
-      }
+      },
+      customActions: await this.actionsService.getPublicCustomActionDefinition(),
     };
   }
 }

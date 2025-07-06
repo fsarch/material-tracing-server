@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { MetaController } from './meta.controller.js';
 import { ModuleConfiguration } from "../../fsarch/configuration/module/module-configuration.module.js";
 import Joi from "joi";
+import { ActionModule } from "../../repositories/actions/action.module.js";
 
 const IMAGE_SERVER_CONFIG_VALIDATOR = Joi.object({
   type: Joi.string().valid('remote').required(),
   admin_url: Joi.string().required(),
   user_url: Joi.string().required(),
 });
+
 
 @Module({
   controllers: [MetaController],
@@ -16,6 +18,7 @@ const IMAGE_SERVER_CONFIG_VALIDATOR = Joi.object({
       validationSchema: IMAGE_SERVER_CONFIG_VALIDATOR,
       name: 'images',
     }),
+    ActionModule,
   ]
 })
 export class MetaModule {}
