@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { StaticAuthService } from './static/static-auth.service.js';
-import type { IAuthService } from './types/auth-service.type.js';
+import type { IAuthService, IUser } from './types/auth-service.type.js';
 import { ConfigAuthType } from '../configuration/config.type.js';
 import { JwtJwkAuthService } from "./jwt-jwk/jwt-jwk-auth.service.js";
 
@@ -19,7 +19,7 @@ export class AuthService implements IAuthService {
     this.authService = authType === 'static' ? staticAuthService : jwtJwkAuthService;
   }
 
-  validateRequest(request: any): Promise<boolean> {
+  validateRequest(request: any): Promise<IUser> {
     return this.authService.validateRequest(request);
   }
 

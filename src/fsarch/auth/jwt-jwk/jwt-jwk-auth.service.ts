@@ -5,6 +5,7 @@ import { ModuleConfigurationService } from "../../configuration/module/module-co
 import { ConfigJwtJwkAuthType } from "../../configuration/config.type.js";
 import { JwtService } from "@nestjs/jwt";
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import { User } from "../user.js";
 
 @Injectable()
 export class JwtJwkAuthService implements IAuthService {
@@ -26,7 +27,7 @@ export class JwtJwkAuthService implements IAuthService {
     return type === 'Bearer' ? token : undefined;
   }
 
-  public async validateRequest(request: any): Promise<boolean> {
+  public async validateRequest(request: any): Promise<User> {
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       console.debug('could not get token from header');
@@ -44,6 +45,9 @@ export class JwtJwkAuthService implements IAuthService {
 
       throw new UnauthorizedException(error);
     }
-    return true;
+
+    return new User({
+      accessToken: token,
+    });
   }
 }

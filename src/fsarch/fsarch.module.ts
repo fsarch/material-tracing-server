@@ -1,4 +1,4 @@
-import { DynamicModule, Global, Module, NestModule } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigurationModule } from './configuration/configuration.module.js';
 import { UacModule } from './uac/uac.module.js';
 import {
@@ -6,7 +6,6 @@ import {
   DatabaseModuleOptions,
 } from './database/database.module.js';
 import { AuthModule } from "./auth/auth.module.js";
-import { AuthService } from "./auth/auth.service.js";
 
 type FSArchOptions = {
   auth?: {};

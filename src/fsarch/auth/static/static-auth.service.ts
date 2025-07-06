@@ -6,6 +6,7 @@ import {
 } from '../../configuration/config.type.js';
 import { ModuleConfigurationService } from '../../configuration/module/module-configuration.service.js';
 import { Request } from "express";
+import { User } from "../user.js";
 
 @Injectable()
 export class StaticAuthService implements IAuthService {
@@ -20,7 +21,7 @@ export class StaticAuthService implements IAuthService {
     return type === 'Bearer' ? token : undefined;
   }
 
-  async validateRequest(request: any): Promise<boolean> {
+  async validateRequest(request: any): Promise<User> {
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       console.debug('could not get token from header');
@@ -37,7 +38,10 @@ export class StaticAuthService implements IAuthService {
 
       throw new UnauthorizedException(error);
     }
-    return true;
+
+    return new User({
+      accessToken: token,
+    });
   }
 
   async signIn(
