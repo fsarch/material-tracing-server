@@ -51,6 +51,10 @@ export class PartService {
       part.externalId = patchDto.externalId;
     }
 
+    if (patchDto.checkoutTime !== undefined) {
+      part.checkoutTime = patchDto.checkoutTime;
+    }
+
     await this.partRepository.save(part);
   }
 
