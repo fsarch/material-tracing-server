@@ -54,6 +54,7 @@ export class Part {
   @Column({
     name: 'checkout_time',
     type: 'timestamp',
+    nullable: true,
   })
   checkoutTime: Date | null = null;
 }

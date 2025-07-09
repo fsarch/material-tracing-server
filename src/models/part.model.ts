@@ -28,6 +28,10 @@ export class PartPatchDto {
   @ApiProperty()
   @IsOptional()
   amount?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  checkoutTime?: Date;
 }
 
 export class PartDto {
@@ -40,6 +44,7 @@ export class PartDto {
     partDto.partTypeId = part.partTypeId;
     partDto.amount = part.amount;
     partDto.creationTime = part.creationTime.toISOString();
+    partDto.checkoutTime = part.checkoutTime;
 
     return partDto;
   }
@@ -66,4 +71,7 @@ export class PartDto {
 
   @ApiProperty()
   creationTime: string;
+
+  @ApiProperty()
+  checkoutTime?: Date;
 }
