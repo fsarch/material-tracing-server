@@ -21,6 +21,7 @@ export class MaterialTypeService {
       name: createDto.name,
       externalId: createDto.externalId,
       manufacturerId: createDto.manufacturerId,
+      hint: createDto.hint,
     });
 
     const savedMaterialType = await this.materialTypeRepository.save(createdMaterialType);

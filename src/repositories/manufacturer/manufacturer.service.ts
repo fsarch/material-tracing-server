@@ -19,6 +19,7 @@ export class ManufacturerService {
       id: crypto.randomUUID(),
       name: createDto.name,
       externalId: createDto.externalId,
+      hint: createDto.hint,
     });
 
     const savedManufacturer = await this.manufacturerRepository.save(createdManufacturer);
