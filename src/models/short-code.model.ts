@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ShortCode } from "../database/entities/short_code.entity.js";
+import { IsOptional } from "class-validator";
 
 export class ShortCodeCreateDto {
   @ApiProperty()
@@ -7,6 +8,10 @@ export class ShortCodeCreateDto {
 
   @ApiProperty()
   shortCodeTypeId: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class ShortCodeDto {
@@ -17,6 +22,7 @@ export class ShortCodeDto {
     shortCodeDto.code = shortCode.code;
     shortCodeDto.shortCodeTypeId = shortCode.shortCodeTypeId;
     shortCodeDto.creationTime = shortCode.creationTime.toISOString();
+    shortCodeDto.hint = shortCode.hint;
 
     return shortCodeDto;
   }
@@ -32,4 +38,7 @@ export class ShortCodeDto {
 
   @ApiProperty()
   creationTime: string;
+
+  @ApiProperty({ required: false })
+  hint?: string;
 }

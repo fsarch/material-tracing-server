@@ -14,6 +14,10 @@ export class PartCreateDto {
 
   @ApiProperty()
   amount: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class PartPatchDto {
@@ -32,6 +36,10 @@ export class PartPatchDto {
   @ApiProperty()
   @IsOptional()
   checkoutTime?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class PartDto {
@@ -45,6 +53,7 @@ export class PartDto {
     partDto.amount = part.amount;
     partDto.creationTime = part.creationTime.toISOString();
     partDto.checkoutTime = part.checkoutTime;
+    partDto.hint = part.hint;
 
     return partDto;
   }
@@ -74,4 +83,7 @@ export class PartDto {
 
   @ApiProperty()
   checkoutTime?: Date;
+
+  @ApiProperty({ required: false })
+  hint?: string;
 }

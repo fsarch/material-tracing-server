@@ -44,4 +44,11 @@ export class MaterialType {
     name: 'deletion_time',
   })
   deletionTime: Date;
+
+  @Column({
+    name: 'hint',
+    type: 'text',
+    nullable: true,
+  })
+  hint: string | null = null;
 }

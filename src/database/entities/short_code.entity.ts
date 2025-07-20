@@ -37,4 +37,11 @@ export class ShortCode {
     name: 'deletion_time',
   })
   deletionTime: Date;
+
+  @Column({
+    name: 'hint',
+    type: 'text',
+    nullable: true,
+  })
+  hint: string | null = null;
 }

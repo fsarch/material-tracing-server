@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { MaterialType } from "../database/entities/material_type.entity.js";
+import { IsOptional } from "class-validator";
 
 export class MaterialTypeCreateDto {
   @ApiProperty()
@@ -10,6 +11,10 @@ export class MaterialTypeCreateDto {
 
   @ApiProperty()
   manufacturerId: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class MaterialTypeDto {
@@ -20,6 +25,7 @@ export class MaterialTypeDto {
     materialTypeDto.name = materialType.name;
     materialTypeDto.externalId = materialType.externalId;
     materialTypeDto.manufacturerId = materialType.manufacturerId;
+    materialTypeDto.hint = materialType.hint;
 
     return materialTypeDto;
   }
@@ -35,4 +41,7 @@ export class MaterialTypeDto {
 
   @ApiProperty()
   manufacturerId: string;
+
+  @ApiProperty({ required: false })
+  hint?: string;
 }

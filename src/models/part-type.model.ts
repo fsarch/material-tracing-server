@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { PartType } from "../database/entities/part_type.entity.js";
+import { IsOptional } from "class-validator";
 
 export class PartTypeCreateDto {
   @ApiProperty()
@@ -7,6 +8,10 @@ export class PartTypeCreateDto {
 
   @ApiProperty()
   externalId: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class PartTypePatchDto {
@@ -19,6 +24,10 @@ export class PartTypePatchDto {
     required: false,
   })
   externalId?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class PartTypeDto {
@@ -28,6 +37,7 @@ export class PartTypeDto {
     partTypeDto.id = partType.id;
     partTypeDto.name = partType.name;
     partTypeDto.externalId = partType.externalId;
+    partTypeDto.hint = partType.hint;
 
     return partTypeDto;
   }
@@ -40,4 +50,7 @@ export class PartTypeDto {
 
   @ApiProperty()
   externalId: string;
+
+  @ApiProperty({ required: false })
+  hint?: string;
 }

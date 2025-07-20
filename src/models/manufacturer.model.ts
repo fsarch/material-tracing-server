@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Manufacturer } from "../database/entities/manufacturer.entity.js";
+import { IsOptional } from "class-validator";
 
 export class ManufacturerCreateDto {
   @ApiProperty()
@@ -7,6 +8,10 @@ export class ManufacturerCreateDto {
 
   @ApiProperty()
   externalId: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class ManufacturerDto {
@@ -16,6 +21,7 @@ export class ManufacturerDto {
     manufacturerDto.id = catalog.id;
     manufacturerDto.name = catalog.name;
     manufacturerDto.externalId = catalog.externalId;
+    manufacturerDto.hint = catalog.hint;
 
     return manufacturerDto;
   }
@@ -28,4 +34,7 @@ export class ManufacturerDto {
 
   @ApiProperty()
   externalId: string;
+
+  @ApiProperty({ required: false })
+  hint?: string;
 }
