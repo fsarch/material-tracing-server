@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Material } from "../../database/entities/material.entity.js";
 import { IsNull, Repository } from "typeorm";
-import { MaterialCreateDto } from "../../models/material.model.js";
+import { MaterialCreateDto, MaterialUpdateDto } from "../../models/material.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
 
@@ -77,5 +77,30 @@ export class MaterialService {
       id,
       deletionTime,
     });
+  }
+
+  public async UpdateMaterial(id: string, updateDto: MaterialUpdateDto): Promise<void> {
+    const material = await this.GetById(id);
+    if (!material) {
+      throw new NotFoundException('Material not found');
+    }
+
+    // Check if material is checked out
+    if (material.checkoutTime) {
+      throw new BadRequestException('Cannot update material that is checked out');
+    }
+
+    // Update only provided fields
+    if (updateDto.name !== undefined) {
+      material.name = updateDto.name;
+    }
+    if (updateDto.externalId !== undefined) {
+      material.externalId = updateDto.externalId;
+    }
+    if (updateDto.hint !== undefined) {
+      material.hint = updateDto.hint;
+    }
+
+    await this.materialRepository.save(material);
   }
 }

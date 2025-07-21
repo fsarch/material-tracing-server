@@ -14,6 +14,16 @@ export class ManufacturerCreateDto {
   hint?: string;
 }
 
+export class ManufacturerUpdateDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
+}
+
 export class ManufacturerDto {
   public static FromDbo(catalog: Manufacturer): ManufacturerDto {
     const manufacturerDto = new ManufacturerDto();

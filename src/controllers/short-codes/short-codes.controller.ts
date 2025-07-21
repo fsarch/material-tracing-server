@@ -1,7 +1,7 @@
-import { Controller, Get, NotFoundException, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Post, Query, Patch, Body } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../repositories/short-code/short-code.service.js";
-import { ShortCodeDto } from "../../models/short-code.model.js";
+import { ShortCodeDto, ShortCodeUpdateDto } from "../../models/short-code.model.js";
 import { ShortCodeType } from "../../constants/short-code-type.enum.js";
 
 @ApiTags('short-code')
@@ -46,5 +46,15 @@ export class ShortCodesController {
     }
 
     return ShortCodeDto.FromDbo(shortCode);
+  }
+
+  @Patch(':code')
+  public async UpdateShortCode(@Param('code') code: string, @Body() updateDto: ShortCodeUpdateDto) {
+    const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
+    if (!shortCode) {
+      throw new NotFoundException();
+    }
+
+    await this.shortCodeService.UpdateShortCodeHint(shortCode.id, updateDto);
   }
 }

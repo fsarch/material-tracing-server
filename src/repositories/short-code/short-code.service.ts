@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ShortCode } from "../../database/entities/short_code.entity.js";
 import * as crypto from "node:crypto";
 import { customAlphabet } from "nanoid";
 import { ShortCodeType } from "../../constants/short-code-type.enum.js";
-import { ShortCodeCreateDto } from "../../models/short-code.model.js";
+import { ShortCodeCreateDto, ShortCodeUpdateDto } from "../../models/short-code.model.js";
 
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
@@ -86,6 +86,22 @@ export class ShortCodeService {
     });
 
     shortCode.shortCodeTypeId = updateDto.shortCodeTypeId;
+
+    await this.shortCodeRepository.save(shortCode);
+  }
+
+  public async UpdateShortCodeHint(id: string, updateDto: ShortCodeUpdateDto): Promise<void> {
+    const shortCode = await this.shortCodeRepository.findOne({
+      where: { id },
+    });
+
+    if (!shortCode) {
+      throw new NotFoundException('Short code not found');
+    }
+
+    if (updateDto.hint !== undefined) {
+      shortCode.hint = updateDto.hint;
+    }
 
     await this.shortCodeRepository.save(shortCode);
   }

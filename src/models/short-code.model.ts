@@ -14,6 +14,12 @@ export class ShortCodeCreateDto {
   hint?: string;
 }
 
+export class ShortCodeUpdateDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
+}
+
 export class ShortCodeDto {
   public static FromDbo(shortCode: ShortCode): ShortCodeDto {
     const shortCodeDto = new ShortCodeDto();
