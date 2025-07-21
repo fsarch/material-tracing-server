@@ -58,4 +58,11 @@ export class Material {
     nullable: true,
   })
   checkoutTime: Date | null = null;
+
+  @Column({
+    name: 'hint',
+    type: 'text',
+    nullable: true,
+  })
+  hint: string | null = null;
 }

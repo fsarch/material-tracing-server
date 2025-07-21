@@ -20,6 +20,7 @@ export class MaterialService {
       materialTypeId: createDto.materialTypeId,
       externalId: createDto.externalId,
       imageRef: createDto.imageRef,
+      hint: createDto.hint,
     });
 
     const savedMaterial = await this.materialRepository.save(createdMaterial);

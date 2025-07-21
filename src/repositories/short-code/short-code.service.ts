@@ -5,6 +5,7 @@ import { ShortCode } from "../../database/entities/short_code.entity.js";
 import * as crypto from "node:crypto";
 import { customAlphabet } from "nanoid";
 import { ShortCodeType } from "../../constants/short-code-type.enum.js";
+import { ShortCodeCreateDto } from "../../models/short-code.model.js";
 
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
@@ -32,6 +33,21 @@ export class ShortCodeService {
     return {
       id: savedShortCode.id,
       code: savedShortCode.code,
+    };
+  }
+
+  public async CreateShortCodeFromDto(createDto: ShortCodeCreateDto) {
+    const createdShortCode = this.shortCodeRepository.create({
+      id: crypto.randomUUID(),
+      code: createDto.code,
+      shortCodeTypeId: createDto.shortCodeTypeId,
+      hint: createDto.hint,
+    });
+
+    const savedShortCode = await this.shortCodeRepository.save(createdShortCode);
+
+    return {
+      id: savedShortCode.id,
     };
   }
 

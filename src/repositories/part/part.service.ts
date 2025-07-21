@@ -25,6 +25,7 @@ export class PartService {
       partTypeId: createDto.partTypeId,
       externalId: createDto.externalId,
       amount: createDto.amount,
+      hint: createDto.hint,
     });
 
     const savedMaterial = await this.partRepository.save(createdMaterial);
@@ -53,6 +54,10 @@ export class PartService {
 
     if (patchDto.checkoutTime !== undefined) {
       part.checkoutTime = patchDto.checkoutTime;
+    }
+
+    if (patchDto.hint !== undefined) {
+      part.hint = patchDto.hint;
     }
 
     await this.partRepository.save(part);

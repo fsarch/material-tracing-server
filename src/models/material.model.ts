@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Material } from "../database/entities/material.entity.js";
+import { IsOptional } from "class-validator";
 
 export class MaterialCreateDto {
   @ApiProperty()
@@ -13,6 +14,10 @@ export class MaterialCreateDto {
 
   @ApiProperty()
   imageRef: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
 }
 
 export class MaterialDto {
@@ -26,6 +31,7 @@ export class MaterialDto {
     materialDto.imageRef = material.imageRef;
     materialDto.creationTime = material.creationTime;
     materialDto.checkoutTime = material.checkoutTime;
+    materialDto.hint = material.hint;
 
     return materialDto;
   }
@@ -50,4 +56,7 @@ export class MaterialDto {
 
   @ApiProperty()
   checkoutTime?: Date;
+
+  @ApiProperty({ required: false })
+  hint?: string;
 }

@@ -20,6 +20,7 @@ export class PartTypeService {
       id: crypto.randomUUID(),
       name: createDto.name,
       externalId: createDto.externalId,
+      hint: createDto.hint,
     });
 
     const savedMaterialType = await this.partTypeRepository.save(createdMaterialType);
@@ -54,6 +55,10 @@ export class PartTypeService {
 
     if (partTypePatchDto.externalId !== undefined) {
       partType.externalId = partTypePatchDto.externalId;
+    }
+
+    if (partTypePatchDto.hint !== undefined) {
+      partType.hint = partTypePatchDto.hint;
     }
 
     await this.partTypeRepository.save(partType);
