@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { MaterialTypeCreateDto, MaterialTypeDto } from "../../models/material-type.model.js";
+import { MaterialTypeCreateDto, MaterialTypeDto, MaterialTypeUpdateDto } from "../../models/material-type.model.js";
 import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
 import { OnEvent } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
@@ -42,6 +42,14 @@ export class MaterialTypesController {
     @Param('materialTypeId') materialTypeId: string,
   ): Promise<void> {
     await this.materialTypeService.DeleteById(materialTypeId);
+  }
+
+  @Patch('/:materialTypeId')
+  public async Update(
+    @Param('materialTypeId') materialTypeId: string,
+    @Body() updateDto: MaterialTypeUpdateDto,
+  ): Promise<void> {
+    await this.materialTypeService.UpdateMaterialType(materialTypeId, updateDto);
   }
 
   @OnEvent(EEvent.DELETE_MANUFACTURER)

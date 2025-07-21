@@ -17,6 +17,20 @@ export class MaterialTypeCreateDto {
   hint?: string;
 }
 
+export class MaterialTypeUpdateDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  externalId?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hint?: string;
+}
+
 export class MaterialTypeDto {
   public static FromDbo(materialType: MaterialType): MaterialTypeDto {
     const materialTypeDto = new MaterialTypeDto();

@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { MaterialService } from "../../repositories/material/material.service.js";
-import { MaterialCreateDto, MaterialDto } from "../../models/material.model.js";
+import { MaterialCreateDto, MaterialDto, MaterialUpdateDto } from "../../models/material.model.js";
 import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
 import { OnEvent } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
@@ -57,6 +57,11 @@ export class MaterialsController {
   @Post('/:materialId/_actions/checkout')
   public async Checkout(@Param('materialId') materialId: string) {
     await this.materialService.CheckoutMaterial(materialId);
+  }
+
+  @Patch('/:materialId')
+  public async Update(@Param('materialId') materialId: string, @Body() updateDto: MaterialUpdateDto) {
+    await this.materialService.UpdateMaterial(materialId, updateDto);
   }
 
   @OnEvent(EEvent.DELETE_MATERIAL_TYPE)

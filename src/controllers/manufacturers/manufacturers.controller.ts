@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ManufacturerService } from "../../repositories/manufacturer/manufacturer.service.js";
-import { ManufacturerCreateDto, ManufacturerDto } from "../../models/manufacturer.model.js";
+import { ManufacturerCreateDto, ManufacturerDto, ManufacturerUpdateDto } from "../../models/manufacturer.model.js";
 
 @ApiTags('manufacturers')
 @Controller({
@@ -44,5 +44,13 @@ export class ManufacturersController {
     @Param('manufacturerId') manufacturerId: string,
   ): Promise<void> {
     await this.manufacturerService.DeleteManufacturer(manufacturerId);
+  }
+
+  @Patch('/:manufacturerId')
+  public async Update(
+    @Param('manufacturerId') manufacturerId: string,
+    @Body() updateDto: ManufacturerUpdateDto,
+  ): Promise<void> {
+    await this.manufacturerService.UpdateManufacturer(manufacturerId, updateDto);
   }
 }

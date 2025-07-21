@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Manufacturer } from "../../database/entities/manufacturer.entity.js";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IsNull, Repository } from "typeorm";
-import { ManufacturerCreateDto } from "../../models/manufacturer.model.js";
+import { ManufacturerCreateDto, ManufacturerUpdateDto } from "../../models/manufacturer.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
 
@@ -55,5 +55,22 @@ export class ManufacturerService {
       id,
       deletionTime: deletionTime.toISOString(),
     });
+  }
+
+  public async UpdateManufacturer(id: string, updateDto: ManufacturerUpdateDto): Promise<void> {
+    const manufacturer = await this.GetManufacturerById(id);
+    if (!manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
+    }
+
+    // Update only provided fields
+    if (updateDto.name !== undefined) {
+      manufacturer.name = updateDto.name;
+    }
+    if (updateDto.hint !== undefined) {
+      manufacturer.hint = updateDto.hint;
+    }
+
+    await this.manufacturerRepository.save(manufacturer);
   }
 }
