@@ -68,7 +68,6 @@ export class PartsController {
     const parts = await this.partPartService.List(payload.id);
     for (let part of parts) {
       await this.partPartService.DeleteByPartId(part.id, payload.deletionTime);
-      await this.partService.DeletePart(part.id, payload.deletionTime);
     }
   }
 }
