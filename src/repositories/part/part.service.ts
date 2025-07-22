@@ -63,8 +63,18 @@ export class PartService {
     await this.partRepository.save(part);
   }
 
-  public async ListParts(): Promise<Array<Part>> {
-    return this.partRepository.find();
+  public async ListParts(skip?: number, take?: number): Promise<Array<Part>> {
+    const query = this.partRepository.createQueryBuilder('part');
+    
+    if (skip !== undefined) {
+      query.skip(skip);
+    }
+    
+    if (take !== undefined) {
+      query.take(take);
+    }
+    
+    return query.getMany();
   }
 
   public async ListPartsByPartType(partTypeId: string): Promise<Array<Part>> {

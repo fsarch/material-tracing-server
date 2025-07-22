@@ -20,8 +20,26 @@ export class PartsController {
   }
 
   @Get()
-  public async List() {
-    const parts = await this.partService.ListParts();
+  @ApiQuery({
+    name: 'skip',
+    type: Number,
+    required: false,
+    description: 'Number of items to skip',
+  })
+  @ApiQuery({
+    name: 'take',
+    type: Number,
+    required: false,
+    description: 'Number of items to take (default: 25)',
+  })
+  public async List(
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
+  ) {
+    // Set default take value to 25 if not provided
+    const takeValue = take !== undefined ? take : 25;
+    
+    const parts = await this.partService.ListParts(skip, takeValue);
 
     return parts.map(PartDto.FromDbo);
   }
