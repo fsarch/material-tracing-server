@@ -89,7 +89,10 @@ describe('PartsController', () => {
 
       const result = await controller.List();
 
-      expect(partService.ListParts).toHaveBeenCalledWith(undefined, 25);
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 25,
+      });
       expect(result).toHaveLength(3);
       expect(result[0]).toEqual(PartDto.FromDbo(mockParts[0]));
     });
@@ -99,7 +102,10 @@ describe('PartsController', () => {
 
       const result = await controller.List(undefined, 2);
 
-      expect(partService.ListParts).toHaveBeenCalledWith(undefined, 2);
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 2,
+      });
       expect(result).toHaveLength(2);
     });
 
@@ -108,7 +114,10 @@ describe('PartsController', () => {
 
       const result = await controller.List(1, 25);
 
-      expect(partService.ListParts).toHaveBeenCalledWith(1, 25);
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: 1,
+        take: 25,
+      });
       expect(result).toHaveLength(2);
     });
 
@@ -117,7 +126,10 @@ describe('PartsController', () => {
 
       const result = await controller.List(1, 1);
 
-      expect(partService.ListParts).toHaveBeenCalledWith(1, 1);
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: 1,
+        take: 1,
+      });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('2');
     });
@@ -127,7 +139,10 @@ describe('PartsController', () => {
 
       const result = await controller.List(undefined, 0);
 
-      expect(partService.ListParts).toHaveBeenCalledWith(undefined, 0);
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 0,
+      });
       expect(result).toHaveLength(0);
     });
   });

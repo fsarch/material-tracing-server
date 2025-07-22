@@ -37,9 +37,12 @@ export class PartsController {
     @Query('take') take?: number,
   ) {
     // Set default take value to 25 if not provided
-    const takeValue = take !== undefined ? take : 25;
-    
-    const parts = await this.partService.ListParts(skip, takeValue);
+    const takeValue = take ?? 25;
+
+    const parts = await this.partService.ListParts({
+      skip,
+      take: takeValue,
+    });
 
     return parts.map(PartDto.FromDbo);
   }

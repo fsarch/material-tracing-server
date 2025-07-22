@@ -63,17 +63,17 @@ export class PartService {
     await this.partRepository.save(part);
   }
 
-  public async ListParts(skip?: number, take?: number): Promise<Array<Part>> {
+  public async ListParts(options: { skip?: number, take?: number }): Promise<Array<Part>> {
     const query = this.partRepository.createQueryBuilder('part');
-    
-    if (skip !== undefined) {
-      query.skip(skip);
+
+    if (options.skip !== undefined) {
+      query.skip(options.skip);
     }
-    
-    if (take !== undefined) {
-      query.take(take);
+
+    if (options.take !== undefined) {
+      query.take(options.take);
     }
-    
+
     return query.getMany();
   }
 
