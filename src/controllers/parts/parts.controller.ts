@@ -32,9 +32,16 @@ export class PartsController {
     required: false,
     description: 'Number of items to take (default: 25)',
   })
+  @ApiQuery({
+    name: 'name',
+    type: String,
+    required: false,
+    description: 'Filter parts by name (case-insensitive, partial matching)',
+  })
   public async List(
     @Query('skip') skip?: number,
     @Query('take') take?: number,
+    @Query('name') name?: string,
   ) {
     // Set default take value to 25 if not provided
     const takeValue = take ?? 25;
@@ -42,6 +49,7 @@ export class PartsController {
     const parts = await this.partService.ListParts({
       skip,
       take: takeValue,
+      name,
     });
 
     return parts.map(PartDto.FromDbo);

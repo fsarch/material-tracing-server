@@ -92,6 +92,7 @@ describe('PartsController', () => {
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: undefined,
         take: 25,
+        name: undefined,
       });
       expect(result).toHaveLength(3);
       expect(result[0]).toEqual(PartDto.FromDbo(mockParts[0]));
@@ -105,6 +106,7 @@ describe('PartsController', () => {
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: undefined,
         take: 2,
+        name: undefined,
       });
       expect(result).toHaveLength(2);
     });
@@ -117,6 +119,7 @@ describe('PartsController', () => {
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: 1,
         take: 25,
+        name: undefined,
       });
       expect(result).toHaveLength(2);
     });
@@ -129,6 +132,7 @@ describe('PartsController', () => {
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: 1,
         take: 1,
+        name: undefined,
       });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('2');
@@ -142,6 +146,61 @@ describe('PartsController', () => {
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: undefined,
         take: 0,
+        name: undefined,
+      });
+      expect(result).toHaveLength(0);
+    });
+
+    it('should filter parts by name when name parameter is provided', async () => {
+      partService.ListParts.mockResolvedValue([mockParts[0]]);
+
+      const result = await controller.List(undefined, undefined, 'Part 1');
+
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 25,
+        name: 'Part 1',
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('Part 1');
+    });
+
+    it('should filter parts by partial name match', async () => {
+      partService.ListParts.mockResolvedValue([mockParts[0], mockParts[1]]);
+
+      const result = await controller.List(undefined, undefined, 'Part');
+
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 25,
+        name: 'Part',
+      });
+      expect(result).toHaveLength(2);
+    });
+
+    it('should combine name filtering with pagination', async () => {
+      partService.ListParts.mockResolvedValue([mockParts[1]]);
+
+      const result = await controller.List(1, 1, 'Part');
+
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: 1,
+        take: 1,
+        name: 'Part',
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('2');
+    });
+
+    it('should return empty array when no parts match the name filter', async () => {
+      partService.ListParts.mockResolvedValue([]);
+
+      const result = await controller.List(undefined, undefined, 'NonExistentPart');
+
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 25,
+        name: 'NonExistentPart',
       });
       expect(result).toHaveLength(0);
     });
