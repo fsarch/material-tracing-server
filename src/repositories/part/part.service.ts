@@ -67,7 +67,13 @@ export class PartService {
     const query = this.partRepository.createQueryBuilder('part');
 
     if (options.name !== undefined) {
-      query.where('part.name ILIKE :name', { name: `%${options.name}%` });
+      // Escape PostgreSQL wildcard characters to prevent injection
+      const escapedName = options.name
+        .replace(/\\/g, '\\\\')  // Escape backslashes first
+        .replace(/%/g, '\\%')    // Escape % wildcards
+        .replace(/_/g, '\\_');   // Escape _ wildcards
+      
+      query.where('part.name ILIKE :name', { name: `%${escapedName}%` });
     }
 
     if (options.skip !== undefined) {

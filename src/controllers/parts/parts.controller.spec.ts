@@ -204,5 +204,19 @@ describe('PartsController', () => {
       });
       expect(result).toHaveLength(0);
     });
+
+    it('should handle wildcard characters in name filter safely', async () => {
+      partService.ListParts.mockResolvedValue([]);
+
+      // Test with wildcard characters that should be escaped
+      const result = await controller.List(undefined, undefined, '%_wildcards%');
+
+      expect(partService.ListParts).toHaveBeenCalledWith({
+        skip: undefined,
+        take: 25,
+        name: '%_wildcards%',
+      });
+      expect(result).toHaveLength(0);
+    });
   });
 });
