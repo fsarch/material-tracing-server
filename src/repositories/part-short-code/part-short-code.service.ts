@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { PartShortCode } from "../../database/entities/part_short_code.entity.js";
+import * as crypto from "node:crypto";
 
 @Injectable()
 export class PartShortCodeService {

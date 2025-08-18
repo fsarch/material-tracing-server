@@ -5,6 +5,7 @@ import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
 import { MaterialShortCodeService } from "../../../repositories/material-short-code/material-short-code.service.js";
 import { OnEvent } from "@nestjs/event-emitter";
 import { EEvent } from "../../../constants/event.enum.js";
+import { ApiError } from "../../../models/error.model.js";
 
 @ApiTags('short-code')
 @Controller({
@@ -48,6 +49,13 @@ export class MaterialShortCodesController {
     const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
     if (!shortCode) {
       throw new NotFoundException();
+    }
+
+    // Check if the short code is already connected to another resource
+    const existingConnection = await this.shortCodeService.CheckShortCodeConnection(shortCode.id);
+    if (existingConnection) {
+      const error = ApiError.alreadyConnected(existingConnection.type, existingConnection.id);
+      throw new ConflictException(error.toResponse());
     }
 
     await this.shortCodeService.UpdateShortCode(shortCode.id, {

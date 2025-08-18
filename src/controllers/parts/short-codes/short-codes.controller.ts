@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
 import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
 import { PartShortCodeService } from "../../../repositories/part-short-code/part-short-code.service.js";
+import { ApiError } from "../../../models/error.model.js";
 
 @ApiTags('short-code')
 @Controller({
@@ -46,6 +47,13 @@ export class PartShortCodesController {
     const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
     if (!shortCode) {
       throw new NotFoundException();
+    }
+
+    // Check if the short code is already connected to another resource
+    const existingConnection = await this.shortCodeService.CheckShortCodeConnection(shortCode.id);
+    if (existingConnection) {
+      const error = ApiError.alreadyConnected(existingConnection.type, existingConnection.id);
+      throw new ConflictException(error.toResponse());
     }
 
     await this.shortCodeService.UpdateShortCode(shortCode.id, {
