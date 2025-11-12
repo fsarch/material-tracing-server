@@ -74,6 +74,9 @@ export class PartShortCodesController {
     }
 
     await this.partShortCodeService.DeleteById(foundShortCode.id);
+    await this.shortCodeService.UpdateShortCode(foundShortCode.shortCodeId, {
+      shortCodeTypeId: null,
+    });
 
     return {};
   }
