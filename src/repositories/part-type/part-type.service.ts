@@ -21,6 +21,7 @@ export class PartTypeService {
       name: createDto.name,
       externalId: createDto.externalId,
       hint: createDto.hint,
+      archiveTime: createDto.archiveTime,
     });
 
     const savedMaterialType = await this.partTypeRepository.save(createdMaterialType);
@@ -30,8 +31,12 @@ export class PartTypeService {
     };
   }
 
-  public async ListPartTypes(): Promise<Array<PartTypeDto>> {
-    return this.partTypeRepository.find();
+  public async ListPartTypes(isArchived: boolean = false): Promise<Array<PartTypeDto>> {
+    return this.partTypeRepository.find({
+      where: {
+        archiveTime: isArchived ? undefined : IsNull(),
+      },
+    });
   }
 
   public async GetPartType(id: string): Promise<PartType | null> {
@@ -59,6 +64,10 @@ export class PartTypeService {
 
     if (partTypePatchDto.hint !== undefined) {
       partType.hint = partTypePatchDto.hint;
+    }
+
+    if (partTypePatchDto.archiveTime !== undefined) {
+      partType.archiveTime = partTypePatchDto.archiveTime;
     }
 
     await this.partTypeRepository.save(partType);

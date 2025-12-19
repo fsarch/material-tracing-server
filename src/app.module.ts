@@ -20,6 +20,7 @@ import { PartAmount1748372988976 } from "./database/migrations/1748372988976-par
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CheckoutTime1749376805136 } from "./database/migrations/1749376805136-checkout-time.js";
 import { AddHintFields1753046680101 } from "./database/migrations/1753046680101-add-hint-fields.js";
+import { AddArchiveTime1753200000000 } from "./database/migrations/1753200000000-add-archive-time.js";
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AddHintFields1753046680101 } from "./database/migrations/1753046680101-
           PartAmount1748372988976,
           CheckoutTime1749376805136,
           AddHintFields1753046680101,
+          AddArchiveTime1753200000000,
         ],
       },
     }),

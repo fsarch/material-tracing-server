@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Patch } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, Post, Patch, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { MaterialTypeCreateDto, MaterialTypeDto, MaterialTypeUpdateDto } from "../../models/material-type.model.js";
 import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -22,8 +22,14 @@ export class MaterialTypesController {
   }
 
   @Get()
-  public async List(): Promise<Array<MaterialTypeDto>> {
-    const materialTypes = await this.materialTypeService.ListMaterialTypes();
+  @ApiQuery({
+    name: 'isArchived',
+    type: Boolean,
+    required: false,
+    description: 'Filter by archived status (default: false)',
+  })
+  public async List(@Query('isArchived') isArchived?: boolean): Promise<Array<MaterialTypeDto>> {
+    const materialTypes = await this.materialTypeService.ListMaterialTypes(isArchived ?? false);
 
     return materialTypes.map(MaterialTypeDto.FromDbo);
   }

@@ -26,6 +26,7 @@ export class PartService {
       externalId: createDto.externalId,
       amount: createDto.amount,
       hint: createDto.hint,
+      archiveTime: createDto.archiveTime,
     });
 
     const savedMaterial = await this.partRepository.save(createdMaterial);
@@ -60,11 +61,23 @@ export class PartService {
       part.hint = patchDto.hint;
     }
 
+    if (patchDto.archiveTime !== undefined) {
+      part.archiveTime = patchDto.archiveTime;
+    }
+
     await this.partRepository.save(part);
   }
 
-  public async ListParts(options: { skip?: number, take?: number, name?: string }): Promise<Array<Part>> {
+  public async ListParts(options: { skip?: number, take?: number, name?: string, isArchived?: boolean }): Promise<Array<Part>> {
     const query = this.partRepository.createQueryBuilder('part');
+
+    // Apply archive filter (default to non-archived)
+    const isArchived = options.isArchived ?? false;
+    if (isArchived) {
+      query.andWhere('part.archive_time IS NOT NULL');
+    } else {
+      query.andWhere('part.archive_time IS NULL');
+    }
 
     if (options.name !== undefined) {
       // Escape PostgreSQL wildcard characters to prevent injection
@@ -73,7 +86,7 @@ export class PartService {
         .replace(/%/g, '\\%')    // Escape % wildcards
         .replace(/_/g, '\\_');   // Escape _ wildcards
       
-      query.where('part.name ILIKE :name', { name: `%${escapedName}%` });
+      query.andWhere('part.name ILIKE :name', { name: `%${escapedName}%` });
     }
 
     if (options.skip !== undefined) {

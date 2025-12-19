@@ -18,6 +18,10 @@ export class MaterialCreateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class MaterialUpdateDto {
@@ -32,6 +36,10 @@ export class MaterialUpdateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class MaterialDto {
@@ -46,6 +54,7 @@ export class MaterialDto {
     materialDto.creationTime = material.creationTime;
     materialDto.checkoutTime = material.checkoutTime;
     materialDto.hint = material.hint;
+    materialDto.archiveTime = material.archiveTime;
 
     return materialDto;
   }
@@ -73,4 +82,7 @@ export class MaterialDto {
 
   @ApiProperty({ required: false })
   hint?: string;
+
+  @ApiProperty({ required: false })
+  archiveTime?: Date;
 }

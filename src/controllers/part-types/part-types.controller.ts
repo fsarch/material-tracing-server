@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { PartTypeCreateDto, PartTypeDto, PartTypePatchDto } from "../../models/part-type.model.js";
 import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
 
@@ -21,8 +21,14 @@ export class PartTypesController {
   }
 
   @Get()
-  public async List(): Promise<Array<PartTypeDto>> {
-    const partTypes = await this.partTypeService.ListPartTypes();
+  @ApiQuery({
+    name: 'isArchived',
+    type: Boolean,
+    required: false,
+    description: 'Filter by archived status (default: false)',
+  })
+  public async List(@Query('isArchived') isArchived?: boolean): Promise<Array<PartTypeDto>> {
+    const partTypes = await this.partTypeService.ListPartTypes(isArchived ?? false);
 
     return partTypes.map(PartTypeDto.FromDbo);
   }

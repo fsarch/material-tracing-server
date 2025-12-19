@@ -21,6 +21,7 @@ export class MaterialService {
       externalId: createDto.externalId,
       imageRef: createDto.imageRef,
       hint: createDto.hint,
+      archiveTime: createDto.archiveTime,
     });
 
     const savedMaterial = await this.materialRepository.save(createdMaterial);
@@ -30,8 +31,12 @@ export class MaterialService {
     };
   }
 
-  public async ListMaterials(): Promise<Array<Material>> {
-    return this.materialRepository.find();
+  public async ListMaterials(isArchived: boolean = false): Promise<Array<Material>> {
+    return this.materialRepository.find({
+      where: {
+        archiveTime: isArchived ? undefined : IsNull(),
+      },
+    });
   }
 
   public async ListByMaterialType(materialTypeId: string): Promise<Array<Material>> {
@@ -99,6 +104,9 @@ export class MaterialService {
     }
     if (updateDto.hint !== undefined) {
       material.hint = updateDto.hint;
+    }
+    if (updateDto.archiveTime !== undefined) {
+      material.archiveTime = updateDto.archiveTime;
     }
 
     await this.materialRepository.save(material);
