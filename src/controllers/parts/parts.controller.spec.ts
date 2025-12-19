@@ -20,6 +20,7 @@ describe('PartsController', () => {
       deletionTime: null,
       checkoutTime: null,
       hint: 'Test part 1',
+      archiveTime: null,
     },
     {
       id: '2',
@@ -31,6 +32,7 @@ describe('PartsController', () => {
       deletionTime: null,
       checkoutTime: null,
       hint: 'Test part 2',
+      archiveTime: null,
     },
     {
       id: '3',
@@ -42,6 +44,7 @@ describe('PartsController', () => {
       deletionTime: null,
       checkoutTime: null,
       hint: 'Test part 3',
+      archiveTime: null,
     },
   ];
 
@@ -93,6 +96,7 @@ describe('PartsController', () => {
         skip: undefined,
         take: 25,
         name: undefined,
+        isArchived: false,
       });
       expect(result).toHaveLength(3);
       expect(result[0]).toEqual(PartDto.FromDbo(mockParts[0]));
@@ -107,6 +111,7 @@ describe('PartsController', () => {
         skip: undefined,
         take: 2,
         name: undefined,
+        isArchived: false,
       });
       expect(result).toHaveLength(2);
     });
@@ -120,6 +125,7 @@ describe('PartsController', () => {
         skip: 1,
         take: 25,
         name: undefined,
+        isArchived: false,
       });
       expect(result).toHaveLength(2);
     });
@@ -133,6 +139,7 @@ describe('PartsController', () => {
         skip: 1,
         take: 1,
         name: undefined,
+        isArchived: false,
       });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('2');
@@ -147,6 +154,7 @@ describe('PartsController', () => {
         skip: undefined,
         take: 0,
         name: undefined,
+        isArchived: false,
       });
       expect(result).toHaveLength(0);
     });
@@ -160,6 +168,7 @@ describe('PartsController', () => {
         skip: undefined,
         take: 25,
         name: 'Part 1',
+        isArchived: false,
       });
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('Part 1');
@@ -174,6 +183,7 @@ describe('PartsController', () => {
         skip: undefined,
         take: 25,
         name: 'Part',
+        isArchived: false,
       });
       expect(result).toHaveLength(2);
     });
