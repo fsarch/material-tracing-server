@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { MaterialType } from "../../database/entities/material_type.entity.js";
-import { IsNull, Repository } from "typeorm";
+import { IsNull, Repository, Not } from "typeorm";
 import { MaterialTypeCreateDto, MaterialTypeUpdateDto } from "../../models/material-type.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
@@ -33,11 +33,11 @@ export class MaterialTypeService {
   }
 
   public async ListMaterialTypes(isArchived: boolean = false): Promise<Array<MaterialType>> {
-    return this.materialTypeRepository.find({
-      where: {
-        archiveTime: isArchived ? undefined : IsNull(),
-      },
-    });
+    const where = isArchived
+      ? { archiveTime: Not(IsNull()) }
+      : { archiveTime: IsNull() };
+    
+    return this.materialTypeRepository.find({ where });
   }
 
   public async ListByManufacturer(manufacturerId: string): Promise<Array<MaterialType>> {

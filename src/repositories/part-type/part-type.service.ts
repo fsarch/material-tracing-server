@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { IsNull, Repository } from "typeorm";
+import { IsNull, Repository, Not } from "typeorm";
 import { PartTypeCreateDto, PartTypeDto, PartTypePatchDto } from "../../models/part-type.model.js";
 import { PartType } from "../../database/entities/part_type.entity.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
@@ -32,11 +32,11 @@ export class PartTypeService {
   }
 
   public async ListPartTypes(isArchived: boolean = false): Promise<Array<PartTypeDto>> {
-    return this.partTypeRepository.find({
-      where: {
-        archiveTime: isArchived ? undefined : IsNull(),
-      },
-    });
+    const where = isArchived
+      ? { archiveTime: Not(IsNull()) }
+      : { archiveTime: IsNull() };
+    
+    return this.partTypeRepository.find({ where });
   }
 
   public async GetPartType(id: string): Promise<PartType | null> {
