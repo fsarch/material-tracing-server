@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 import { getDataType } from "./utils/data-type.mapper.js";
 
-export class AddArchiveTime1753200000000 implements MigrationInterface {
-  name = 'AddArchiveTime1753200000000';
+export class AddArchiveTime1766219951021 implements MigrationInterface {
+  name = 'AddArchiveTime1766219951021';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const databaseType = queryRunner.connection.driver.options.type;
