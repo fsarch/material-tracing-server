@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Material } from "../../database/entities/material.entity.js";
-import { IsNull, Repository } from "typeorm";
+import { IsNull, Repository, Not } from "typeorm";
 import { MaterialCreateDto, MaterialUpdateDto } from "../../models/material.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
@@ -21,6 +21,7 @@ export class MaterialService {
       externalId: createDto.externalId,
       imageRef: createDto.imageRef,
       hint: createDto.hint,
+      archiveTime: createDto.archiveTime,
     });
 
     const savedMaterial = await this.materialRepository.save(createdMaterial);
@@ -30,8 +31,12 @@ export class MaterialService {
     };
   }
 
-  public async ListMaterials(): Promise<Array<Material>> {
-    return this.materialRepository.find();
+  public async ListMaterials(isArchived: boolean = false): Promise<Array<Material>> {
+    const where = isArchived
+      ? { archiveTime: Not(IsNull()) }
+      : { archiveTime: IsNull() };
+    
+    return this.materialRepository.find({ where });
   }
 
   public async ListByMaterialType(materialTypeId: string): Promise<Array<Material>> {
@@ -99,6 +104,9 @@ export class MaterialService {
     }
     if (updateDto.hint !== undefined) {
       material.hint = updateDto.hint;
+    }
+    if (updateDto.archiveTime !== undefined) {
+      material.archiveTime = updateDto.archiveTime;
     }
 
     await this.materialRepository.save(material);

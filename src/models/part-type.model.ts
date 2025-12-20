@@ -12,6 +12,10 @@ export class PartTypeCreateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class PartTypePatchDto {
@@ -28,6 +32,10 @@ export class PartTypePatchDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class PartTypeDto {
@@ -38,6 +46,7 @@ export class PartTypeDto {
     partTypeDto.name = partType.name;
     partTypeDto.externalId = partType.externalId;
     partTypeDto.hint = partType.hint;
+    partTypeDto.archiveTime = partType.archiveTime;
 
     return partTypeDto;
   }
@@ -53,4 +62,7 @@ export class PartTypeDto {
 
   @ApiProperty({ required: false })
   hint?: string;
+
+  @ApiProperty({ required: false })
+  archiveTime?: Date;
 }

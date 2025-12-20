@@ -15,6 +15,10 @@ export class MaterialTypeCreateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class MaterialTypeUpdateDto {
@@ -29,6 +33,10 @@ export class MaterialTypeUpdateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class MaterialTypeDto {
@@ -40,6 +48,7 @@ export class MaterialTypeDto {
     materialTypeDto.externalId = materialType.externalId;
     materialTypeDto.manufacturerId = materialType.manufacturerId;
     materialTypeDto.hint = materialType.hint;
+    materialTypeDto.archiveTime = materialType.archiveTime;
 
     return materialTypeDto;
   }
@@ -58,4 +67,7 @@ export class MaterialTypeDto {
 
   @ApiProperty({ required: false })
   hint?: string;
+
+  @ApiProperty({ required: false })
+  archiveTime?: Date;
 }

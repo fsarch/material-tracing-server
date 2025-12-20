@@ -18,6 +18,10 @@ export class PartCreateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class PartPatchDto {
@@ -40,6 +44,10 @@ export class PartPatchDto {
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  archiveTime?: Date;
 }
 
 export class PartDto {
@@ -54,6 +62,7 @@ export class PartDto {
     partDto.creationTime = part.creationTime.toISOString();
     partDto.checkoutTime = part.checkoutTime;
     partDto.hint = part.hint;
+    partDto.archiveTime = part.archiveTime;
 
     return partDto;
   }
@@ -86,4 +95,7 @@ export class PartDto {
 
   @ApiProperty({ required: false })
   hint?: string;
+
+  @ApiProperty({ required: false })
+  archiveTime?: Date;
 }

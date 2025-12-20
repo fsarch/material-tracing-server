@@ -65,4 +65,11 @@ export class Material {
     nullable: true,
   })
   hint: string | null = null;
+
+  @Column({
+    name: 'archive_time',
+    type: 'timestamp',
+    nullable: true,
+  })
+  archiveTime: Date | null = null;
 }
