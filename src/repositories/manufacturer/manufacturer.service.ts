@@ -29,8 +29,24 @@ export class ManufacturerService {
     };
   }
 
-  public async ListManufacturers(): Promise<Array<Manufacturer>> {
-    return this.manufacturerRepository.find();
+  public async ListManufacturers(search?: string): Promise<Array<Manufacturer>> {
+    const query = this.manufacturerRepository.createQueryBuilder('manufacturer');
+
+    // Apply search filter
+    if (search !== undefined && search !== '') {
+      // Escape PostgreSQL wildcard characters to prevent injection
+      const escapedSearch = search
+        .replace(/\\/g, '\\\\')  // Escape backslashes first
+        .replace(/%/g, '\\%')    // Escape % wildcards
+        .replace(/_/g, '\\_');   // Escape _ wildcards
+      
+      query.andWhere(
+        '(manufacturer.name ILIKE :search OR manufacturer.external_id = :exactSearch)',
+        { search: `%${escapedSearch}%`, exactSearch: search }
+      );
+    }
+
+    return query.getMany();
   }
 
   public async GetManufacturerById(id: string): Promise<Manufacturer | null> {

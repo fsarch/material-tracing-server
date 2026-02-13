@@ -31,12 +31,31 @@ export class PartTypeService {
     };
   }
 
-  public async ListPartTypes(isArchived: boolean = false): Promise<Array<PartTypeDto>> {
-    const where = isArchived
-      ? { archiveTime: Not(IsNull()) }
-      : { archiveTime: IsNull() };
+  public async ListPartTypes(isArchived: boolean = false, search?: string): Promise<Array<PartTypeDto>> {
+    const query = this.partTypeRepository.createQueryBuilder('part_type');
+
+    // Apply archive filter
+    if (isArchived) {
+      query.andWhere('part_type.archive_time IS NOT NULL');
+    } else {
+      query.andWhere('part_type.archive_time IS NULL');
+    }
+
+    // Apply search filter
+    if (search !== undefined && search !== '') {
+      // Escape PostgreSQL wildcard characters to prevent injection
+      const escapedSearch = search
+        .replace(/\\/g, '\\\\')  // Escape backslashes first
+        .replace(/%/g, '\\%')    // Escape % wildcards
+        .replace(/_/g, '\\_');   // Escape _ wildcards
+      
+      query.andWhere(
+        '(part_type.name ILIKE :search OR part_type.external_id = :exactSearch)',
+        { search: `%${escapedSearch}%`, exactSearch: search }
+      );
+    }
     
-    return this.partTypeRepository.find({ where });
+    return query.getMany();
   }
 
   public async GetPartType(id: string): Promise<PartType | null> {

@@ -27,8 +27,17 @@ export class PartTypesController {
     required: false,
     description: 'Filter by archived status (default: false)',
   })
-  public async List(@Query('isArchived') isArchived?: boolean): Promise<Array<PartTypeDto>> {
-    const partTypes = await this.partTypeService.ListPartTypes(isArchived ?? false);
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+    description: 'Search by name (case-insensitive) or externalId',
+  })
+  public async List(
+    @Query('isArchived') isArchived?: boolean,
+    @Query('search') search?: string,
+  ): Promise<Array<PartTypeDto>> {
+    const partTypes = await this.partTypeService.ListPartTypes(isArchived ?? false, search);
 
     return partTypes.map(PartTypeDto.FromDbo);
   }

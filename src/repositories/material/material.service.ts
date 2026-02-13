@@ -31,12 +31,31 @@ export class MaterialService {
     };
   }
 
-  public async ListMaterials(isArchived: boolean = false): Promise<Array<Material>> {
-    const where = isArchived
-      ? { archiveTime: Not(IsNull()) }
-      : { archiveTime: IsNull() };
+  public async ListMaterials(isArchived: boolean = false, search?: string): Promise<Array<Material>> {
+    const query = this.materialRepository.createQueryBuilder('material');
+
+    // Apply archive filter
+    if (isArchived) {
+      query.andWhere('material.archive_time IS NOT NULL');
+    } else {
+      query.andWhere('material.archive_time IS NULL');
+    }
+
+    // Apply search filter
+    if (search !== undefined && search !== '') {
+      // Escape PostgreSQL wildcard characters to prevent injection
+      const escapedSearch = search
+        .replace(/\\/g, '\\\\')  // Escape backslashes first
+        .replace(/%/g, '\\%')    // Escape % wildcards
+        .replace(/_/g, '\\_');   // Escape _ wildcards
+      
+      query.andWhere(
+        '(material.name ILIKE :search OR material.external_id = :exactSearch OR material.material_type_id = :exactSearch)',
+        { search: `%${escapedSearch}%`, exactSearch: search }
+      );
+    }
     
-    return this.materialRepository.find({ where });
+    return query.getMany();
   }
 
   public async ListByMaterialType(materialTypeId: string): Promise<Array<Material>> {

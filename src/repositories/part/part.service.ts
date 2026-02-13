@@ -68,7 +68,7 @@ export class PartService {
     await this.partRepository.save(part);
   }
 
-  public async ListParts(options: { skip?: number, take?: number, name?: string, isArchived?: boolean }): Promise<Array<Part>> {
+  public async ListParts(options: { skip?: number, take?: number, name?: string, isArchived?: boolean, search?: string }): Promise<Array<Part>> {
     const query = this.partRepository.createQueryBuilder('part');
 
     // Apply archive filter (default to non-archived)
@@ -79,7 +79,20 @@ export class PartService {
       query.andWhere('part.archive_time IS NULL');
     }
 
-    if (options.name !== undefined) {
+    // Apply search filter (takes precedence over name filter if both provided)
+    if (options.search !== undefined && options.search !== '') {
+      // Escape PostgreSQL wildcard characters to prevent injection
+      const escapedSearch = options.search
+        .replace(/\\/g, '\\\\')  // Escape backslashes first
+        .replace(/%/g, '\\%')    // Escape % wildcards
+        .replace(/_/g, '\\_');   // Escape _ wildcards
+      
+      query.andWhere(
+        '(part.name ILIKE :search OR part.external_id = :exactSearch OR part.part_type_id = :exactSearch)',
+        { search: `%${escapedSearch}%`, exactSearch: options.search }
+      );
+    } else if (options.name !== undefined) {
+      // Legacy name filter for backwards compatibility
       // Escape PostgreSQL wildcard characters to prevent injection
       const escapedName = options.name
         .replace(/\\/g, '\\\\')  // Escape backslashes first

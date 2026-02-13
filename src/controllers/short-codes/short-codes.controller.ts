@@ -28,11 +28,19 @@ export class ShortCodesController {
     enum: ShortCodeType,
     enumName: 'ShortCodeType',
   })
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+    description: 'Search by code (case-insensitive)',
+  })
   public async ListShortCodes(
     @Query('shortCodeTypeId') shortCodeTypeId?: ShortCodeType,
+    @Query('search') search?: string,
   ) {
     const shortCodes = await this.shortCodeService.ListShortCodes({
       shortCodeTypeId,
+      search,
     });
 
     return shortCodes.map(ShortCodeDto.FromDbo);

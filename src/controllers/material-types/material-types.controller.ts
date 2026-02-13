@@ -28,8 +28,17 @@ export class MaterialTypesController {
     required: false,
     description: 'Filter by archived status (default: false)',
   })
-  public async List(@Query('isArchived') isArchived?: boolean): Promise<Array<MaterialTypeDto>> {
-    const materialTypes = await this.materialTypeService.ListMaterialTypes(isArchived ?? false);
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+    description: 'Search by name (case-insensitive) or externalId',
+  })
+  public async List(
+    @Query('isArchived') isArchived?: boolean,
+    @Query('search') search?: string,
+  ): Promise<Array<MaterialTypeDto>> {
+    const materialTypes = await this.materialTypeService.ListMaterialTypes(isArchived ?? false, search);
 
     return materialTypes.map(MaterialTypeDto.FromDbo);
   }
