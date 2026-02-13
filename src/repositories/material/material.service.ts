@@ -5,6 +5,7 @@ import { IsNull, Repository, Not } from "typeorm";
 import { MaterialCreateDto, MaterialUpdateDto } from "../../models/material.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 @Injectable()
 export class MaterialService {
@@ -43,11 +44,7 @@ export class MaterialService {
 
     // Apply search filter
     if (search !== undefined && search !== '') {
-      // Escape PostgreSQL wildcard characters to prevent injection
-      const escapedSearch = search
-        .replace(/\\/g, '\\\\')  // Escape backslashes first
-        .replace(/%/g, '\\%')    // Escape % wildcards
-        .replace(/_/g, '\\_');   // Escape _ wildcards
+      const escapedSearch = escapeSqlWildcards(search);
       
       query.andWhere(
         '(material.name ILIKE :search OR material.external_id = :exactSearch OR material.material_type_id = :exactSearch)',

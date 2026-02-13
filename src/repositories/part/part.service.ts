@@ -6,6 +6,7 @@ import { PartCreateDto, PartPatchDto } from "../../models/part.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
 import { PartChildren } from "../../database/entities/part_children.entity.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 @Injectable()
 export class PartService {
@@ -81,11 +82,7 @@ export class PartService {
 
     // Apply search filter (takes precedence over name filter if both provided)
     if (options.search !== undefined && options.search !== '') {
-      // Escape PostgreSQL wildcard characters to prevent injection
-      const escapedSearch = options.search
-        .replace(/\\/g, '\\\\')  // Escape backslashes first
-        .replace(/%/g, '\\%')    // Escape % wildcards
-        .replace(/_/g, '\\_');   // Escape _ wildcards
+      const escapedSearch = escapeSqlWildcards(options.search);
       
       query.andWhere(
         '(part.name ILIKE :search OR part.external_id = :exactSearch OR part.part_type_id = :exactSearch)',
@@ -93,11 +90,7 @@ export class PartService {
       );
     } else if (options.name !== undefined) {
       // Legacy name filter for backwards compatibility
-      // Escape PostgreSQL wildcard characters to prevent injection
-      const escapedName = options.name
-        .replace(/\\/g, '\\\\')  // Escape backslashes first
-        .replace(/%/g, '\\%')    // Escape % wildcards
-        .replace(/_/g, '\\_');   // Escape _ wildcards
+      const escapedName = escapeSqlWildcards(options.name);
       
       query.andWhere('part.name ILIKE :name', { name: `%${escapedName}%` });
     }

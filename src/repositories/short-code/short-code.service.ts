@@ -8,6 +8,7 @@ import * as crypto from "node:crypto";
 import { customAlphabet } from "nanoid";
 import { ShortCodeType } from "../../constants/short-code-type.enum.js";
 import { ShortCodeCreateDto, ShortCodeUpdateDto } from "../../models/short-code.model.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
@@ -74,11 +75,7 @@ export class ShortCodeService {
 
     // Apply search filter for code field
     if (selectOptions.search !== undefined && selectOptions.search !== '') {
-      // Escape PostgreSQL wildcard characters to prevent injection
-      const escapedSearch = selectOptions.search
-        .replace(/\\/g, '\\\\')  // Escape backslashes first
-        .replace(/%/g, '\\%')    // Escape % wildcards
-        .replace(/_/g, '\\_');   // Escape _ wildcards
+      const escapedSearch = escapeSqlWildcards(selectOptions.search);
       
       query.andWhere('short_code.code ILIKE :search', {
         search: `%${escapedSearch}%`,

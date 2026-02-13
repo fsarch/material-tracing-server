@@ -5,6 +5,7 @@ import { PartTypeCreateDto, PartTypeDto, PartTypePatchDto } from "../../models/p
 import { PartType } from "../../database/entities/part_type.entity.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 @Injectable()
 export class PartTypeService {
@@ -43,11 +44,7 @@ export class PartTypeService {
 
     // Apply search filter
     if (search !== undefined && search !== '') {
-      // Escape PostgreSQL wildcard characters to prevent injection
-      const escapedSearch = search
-        .replace(/\\/g, '\\\\')  // Escape backslashes first
-        .replace(/%/g, '\\%')    // Escape % wildcards
-        .replace(/_/g, '\\_');   // Escape _ wildcards
+      const escapedSearch = escapeSqlWildcards(search);
       
       query.andWhere(
         '(part_type.name ILIKE :search OR part_type.external_id = :exactSearch)',
