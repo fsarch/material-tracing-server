@@ -5,6 +5,7 @@ import { IsNull, Repository } from "typeorm";
 import { ManufacturerCreateDto, ManufacturerUpdateDto } from "../../models/manufacturer.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 @Injectable()
 export class ManufacturerService {
@@ -29,8 +30,20 @@ export class ManufacturerService {
     };
   }
 
-  public async ListManufacturers(): Promise<Array<Manufacturer>> {
-    return this.manufacturerRepository.find();
+  public async ListManufacturers(search?: string): Promise<Array<Manufacturer>> {
+    const query = this.manufacturerRepository.createQueryBuilder('manufacturer');
+
+    // Apply search filter
+    if (search !== undefined && search !== '') {
+      const escapedSearch = escapeSqlWildcards(search);
+      
+      query.andWhere(
+        '(manufacturer.name ILIKE :search OR manufacturer.external_id = :exactSearch)',
+        { search: `%${escapedSearch}%`, exactSearch: search }
+      );
+    }
+
+    return query.getMany();
   }
 
   public async GetManufacturerById(id: string): Promise<Manufacturer | null> {

@@ -36,7 +36,13 @@ export class PartsController {
     name: 'name',
     type: String,
     required: false,
-    description: 'Filter parts by name (case-insensitive, partial matching)',
+    description: 'Filter parts by name (case-insensitive, partial matching). Note: search parameter takes precedence if both are provided.',
+  })
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+    description: 'Search by name (case-insensitive), externalId, or partTypeId',
   })
   @ApiQuery({
     name: 'isArchived',
@@ -48,6 +54,7 @@ export class PartsController {
     @Query('skip') skip?: number,
     @Query('take') take?: number,
     @Query('name') name?: string,
+    @Query('search') search?: string,
     @Query('isArchived') isArchived?: boolean,
   ) {
     // Set default take value to 25 if not provided
@@ -57,6 +64,7 @@ export class PartsController {
       skip,
       take: takeValue,
       name,
+      search,
       isArchived: isArchived ?? false,
     });
 

@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Patch } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, Post, Patch, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ManufacturerService } from "../../repositories/manufacturer/manufacturer.service.js";
 import { ManufacturerCreateDto, ManufacturerDto, ManufacturerUpdateDto } from "../../models/manufacturer.model.js";
 
@@ -24,8 +24,14 @@ export class ManufacturersController {
   }
 
   @Get()
-  public async List(): Promise<Array<ManufacturerDto>> {
-    const manufacturers = await this.manufacturerService.ListManufacturers();
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+    description: 'Search by name (case-insensitive) or externalId',
+  })
+  public async List(@Query('search') search?: string): Promise<Array<ManufacturerDto>> {
+    const manufacturers = await this.manufacturerService.ListManufacturers(search);
 
     return manufacturers.map(ManufacturerDto.FromDbo);
   }

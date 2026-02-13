@@ -8,12 +8,14 @@ import * as crypto from "node:crypto";
 import { customAlphabet } from "nanoid";
 import { ShortCodeType } from "../../constants/short-code-type.enum.js";
 import { ShortCodeCreateDto, ShortCodeUpdateDto } from "../../models/short-code.model.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
 
 export type TListShortCodeOptions = {
-  shortCodeTypeId: ShortCodeType;
+  shortCodeTypeId?: ShortCodeType;
+  search?: string;
 };
 
 export type TShortCodeConnection = {
@@ -63,20 +65,26 @@ export class ShortCodeService {
   }
 
   public async ListShortCodes(selectOptions: TListShortCodeOptions): Promise<Array<ShortCode>> {
-    const where: {
-      shortCodeTypeId?: string
-    } = {};
+    const query = this.shortCodeRepository.createQueryBuilder('short_code');
 
     if (selectOptions.shortCodeTypeId) {
-      where.shortCodeTypeId = selectOptions.shortCodeTypeId;
+      query.andWhere('short_code.short_code_type_id = :shortCodeTypeId', {
+        shortCodeTypeId: selectOptions.shortCodeTypeId,
+      });
     }
 
-    return this.shortCodeRepository.find({
-      where,
-      order: {
-        creationTime: "DESC",
-      },
-    });
+    // Apply search filter for code field
+    if (selectOptions.search !== undefined && selectOptions.search !== '') {
+      const escapedSearch = escapeSqlWildcards(selectOptions.search);
+      
+      query.andWhere('short_code.code ILIKE :search', {
+        search: `%${escapedSearch}%`,
+      });
+    }
+
+    query.orderBy('short_code.creation_time', 'DESC');
+
+    return query.getMany();
   }
 
   public async GetShortCode(id: string): Promise<ShortCode | null> {

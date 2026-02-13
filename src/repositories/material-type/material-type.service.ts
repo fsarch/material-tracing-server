@@ -5,6 +5,7 @@ import { IsNull, Repository, Not } from "typeorm";
 import { MaterialTypeCreateDto, MaterialTypeUpdateDto } from "../../models/material-type.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
+import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
 
 @Injectable()
 export class MaterialTypeService {
@@ -32,12 +33,27 @@ export class MaterialTypeService {
     };
   }
 
-  public async ListMaterialTypes(isArchived: boolean = false): Promise<Array<MaterialType>> {
-    const where = isArchived
-      ? { archiveTime: Not(IsNull()) }
-      : { archiveTime: IsNull() };
+  public async ListMaterialTypes(isArchived: boolean = false, search?: string): Promise<Array<MaterialType>> {
+    const query = this.materialTypeRepository.createQueryBuilder('material_type');
+
+    // Apply archive filter
+    if (isArchived) {
+      query.andWhere('material_type.archive_time IS NOT NULL');
+    } else {
+      query.andWhere('material_type.archive_time IS NULL');
+    }
+
+    // Apply search filter
+    if (search !== undefined && search !== '') {
+      const escapedSearch = escapeSqlWildcards(search);
+      
+      query.andWhere(
+        '(material_type.name ILIKE :search OR material_type.external_id = :exactSearch)',
+        { search: `%${escapedSearch}%`, exactSearch: search }
+      );
+    }
     
-    return this.materialTypeRepository.find({ where });
+    return query.getMany();
   }
 
   public async ListByManufacturer(manufacturerId: string): Promise<Array<MaterialType>> {
