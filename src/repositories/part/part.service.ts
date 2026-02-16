@@ -83,15 +83,26 @@ export class PartService {
     // Apply search filter (takes precedence over name filter if both provided)
     if (options.search !== undefined && options.search !== '') {
       const escapedSearch = escapeSqlWildcards(options.search);
-      
-      query.andWhere(
-        '(part.name ILIKE :search OR part.external_id = :exactSearch OR part.part_type_id = :exactSearch)',
-        { search: `%${escapedSearch}%`, exactSearch: options.search }
-      );
+
+      // Check if search string is a valid UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUuid = uuidRegex.test(options.search);
+
+      if (isUuid) {
+        query.andWhere(
+          '(part.name ILIKE :search OR part.external_id = :exactSearch OR part.part_type_id = :exactSearch)',
+          { search: `%${escapedSearch}%`, exactSearch: options.search }
+        );
+      } else {
+        query.andWhere(
+          '(part.name ILIKE :search OR part.external_id = :exactSearch)',
+          { search: `%${escapedSearch}%`, exactSearch: options.search }
+        );
+      }
     } else if (options.name !== undefined) {
       // Legacy name filter for backwards compatibility
       const escapedName = escapeSqlWildcards(options.name);
-      
+
       query.andWhere('part.name ILIKE :name', { name: `%${escapedName}%` });
     }
 

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Material } from "../../database/entities/material.entity.js";
-import { IsNull, Repository, Not } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { MaterialCreateDto, MaterialUpdateDto } from "../../models/material.model.js";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EEvent } from "../../constants/event.enum.js";
@@ -45,13 +45,24 @@ export class MaterialService {
     // Apply search filter
     if (search !== undefined && search !== '') {
       const escapedSearch = escapeSqlWildcards(search);
-      
-      query.andWhere(
-        '(material.name ILIKE :search OR material.external_id = :exactSearch OR material.material_type_id = :exactSearch)',
-        { search: `%${escapedSearch}%`, exactSearch: search }
-      );
+
+      // Check if search string is a valid UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUuid = uuidRegex.test(search);
+
+      if (isUuid) {
+        query.andWhere(
+          '(material.name ILIKE :search OR material.external_id = :exactSearch OR material.material_type_id = :exactSearch)',
+          { search: `%${escapedSearch}%`, exactSearch: search }
+        );
+      } else {
+        query.andWhere(
+          '(material.name ILIKE :search OR material.external_id = :exactSearch)',
+          { search: `%${escapedSearch}%`, exactSearch: search }
+        );
+      }
     }
-    
+
     return query.getMany();
   }
 
