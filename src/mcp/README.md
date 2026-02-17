@@ -102,6 +102,66 @@ npm run start:mcp
 
 The MCP server uses stdio transport, which is suitable for integration with AI assistants like Claude Desktop.
 
+## Configuration for Claude Desktop
+
+To use the MCP server with Claude Desktop, add the following configuration to your Claude Desktop config file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "material-tracing-server": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/material-tracing-server/dist/mcp-server.js"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "CONFIG_PATH": "/absolute/path/to/your/config.yaml"
+      }
+    }
+  }
+}
+```
+
+### Configuration File
+
+The MCP server uses the same configuration as the main application. Create a `config.yaml` file with your database configuration:
+
+**PostgreSQL/CockroachDB Example:**
+
+```yaml
+database:
+  type: postgres  # or cockroachdb
+  host: localhost
+  port: 5432
+  username: your_username
+  password: your_password
+  database: material_tracing
+```
+
+**SQLite Example:**
+
+```yaml
+database:
+  type: sqlite
+  database: /path/to/database.sqlite
+```
+
+Set the `CONFIG_PATH` environment variable to point to your configuration file.
+
+## Usage Examples
+
+Once configured with Claude Desktop, you can ask questions like:
+
+- "Search for materials containing 'steel'"
+- "Get all archived part types"
+- "Show me checked-out materials"
+- "Find manufacturer by ID [uuid]"
+- "Search for short code 'ABC123'"
+
 ## Integration
 
 The MCP module is integrated into the main application module and uses existing repository services to access the database. This ensures consistency with the REST API and allows the MCP server to leverage the same business logic.
