@@ -41,13 +41,15 @@ describe('ApiError', () => {
 
       // Assert
       expect(response).toEqual({
-        messages: [{
-          code: 'ALREADY_CONNECTED',
-          parameters: {
-            $type: 'material',
-            id: 'test-id',
+        messages: [
+          {
+            code: 'ALREADY_CONNECTED',
+            parameters: {
+              $type: 'material',
+              id: 'test-id',
+            },
           },
-        }],
+        ],
       });
     });
   });

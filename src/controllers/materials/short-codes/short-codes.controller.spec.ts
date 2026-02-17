@@ -45,11 +45,16 @@ describe('MaterialShortCodesController', () => {
       controllers: [MaterialShortCodesController],
       providers: [
         { provide: ShortCodeService, useValue: mockShortCodeService },
-        { provide: MaterialShortCodeService, useValue: mockMaterialShortCodeService },
+        {
+          provide: MaterialShortCodeService,
+          useValue: mockMaterialShortCodeService,
+        },
       ],
     }).compile();
 
-    controller = module.get<MaterialShortCodesController>(MaterialShortCodesController);
+    controller = module.get<MaterialShortCodesController>(
+      MaterialShortCodesController,
+    );
     shortCodeService = module.get(ShortCodeService);
     materialShortCodeService = module.get(MaterialShortCodeService);
   });
@@ -72,28 +77,45 @@ describe('MaterialShortCodesController', () => {
       materialShortCodeService.Create.mockResolvedValue({ id: 'new-msc-id' });
 
       // Act
-      const result = await controller.MapMaterialShortCode('material-1', 'ABC123');
+      const result = await controller.MapMaterialShortCode(
+        'material-1',
+        'ABC123',
+      );
 
       // Assert
       expect(result).toEqual({});
-      expect(materialShortCodeService.ListByMaterialId).toHaveBeenCalledWith('material-1');
-      expect(shortCodeService.GetShortCodeByCode).toHaveBeenCalledWith('ABC123');
-      expect(shortCodeService.CheckShortCodeConnection).toHaveBeenCalledWith('short-1');
+      expect(materialShortCodeService.ListByMaterialId).toHaveBeenCalledWith(
+        'material-1',
+      );
+      expect(shortCodeService.GetShortCodeByCode).toHaveBeenCalledWith(
+        'ABC123',
+      );
+      expect(shortCodeService.CheckShortCodeConnection).toHaveBeenCalledWith(
+        'short-1',
+      );
       expect(shortCodeService.UpdateShortCode).toHaveBeenCalledWith('short-1', {
         shortCodeTypeId: ShortCodeType.MATERIAL,
       });
-      expect(materialShortCodeService.Create).toHaveBeenCalledWith('material-1', 'short-1');
+      expect(materialShortCodeService.Create).toHaveBeenCalledWith(
+        'material-1',
+        'short-1',
+      );
     });
 
     it('should throw ConflictException when material already has short codes', async () => {
       // Arrange
-      materialShortCodeService.ListByMaterialId.mockResolvedValue([mockMaterialShortCode]);
+      materialShortCodeService.ListByMaterialId.mockResolvedValue([
+        mockMaterialShortCode,
+      ]);
 
       // Act & Assert
-      await expect(controller.MapMaterialShortCode('material-1', 'ABC123'))
-        .rejects.toThrow(ConflictException);
+      await expect(
+        controller.MapMaterialShortCode('material-1', 'ABC123'),
+      ).rejects.toThrow(ConflictException);
 
-      expect(materialShortCodeService.ListByMaterialId).toHaveBeenCalledWith('material-1');
+      expect(materialShortCodeService.ListByMaterialId).toHaveBeenCalledWith(
+        'material-1',
+      );
       expect(shortCodeService.GetShortCodeByCode).not.toHaveBeenCalled();
     });
 
@@ -103,10 +125,13 @@ describe('MaterialShortCodesController', () => {
       shortCodeService.GetShortCodeByCode.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(controller.MapMaterialShortCode('material-1', 'NONEXISTENT'))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        controller.MapMaterialShortCode('material-1', 'NONEXISTENT'),
+      ).rejects.toThrow(NotFoundException);
 
-      expect(shortCodeService.GetShortCodeByCode).toHaveBeenCalledWith('NONEXISTENT');
+      expect(shortCodeService.GetShortCodeByCode).toHaveBeenCalledWith(
+        'NONEXISTENT',
+      );
       expect(shortCodeService.CheckShortCodeConnection).not.toHaveBeenCalled();
     });
 
@@ -120,8 +145,9 @@ describe('MaterialShortCodesController', () => {
       });
 
       // Act & Assert
-      await expect(controller.MapMaterialShortCode('material-1', 'ABC123'))
-        .rejects.toThrow(ConflictException);
+      await expect(
+        controller.MapMaterialShortCode('material-1', 'ABC123'),
+      ).rejects.toThrow(ConflictException);
 
       // Verify the exception contains the proper error structure
       try {
@@ -129,17 +155,21 @@ describe('MaterialShortCodesController', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ConflictException);
         expect(error.getResponse()).toEqual({
-          messages: [{
-            code: 'ALREADY_CONNECTED',
-            parameters: {
-              $type: 'material',
-              id: 'other-material-id',
+          messages: [
+            {
+              code: 'ALREADY_CONNECTED',
+              parameters: {
+                $type: 'material',
+                id: 'other-material-id',
+              },
             },
-          }],
+          ],
         });
       }
 
-      expect(shortCodeService.CheckShortCodeConnection).toHaveBeenCalledWith('short-1');
+      expect(shortCodeService.CheckShortCodeConnection).toHaveBeenCalledWith(
+        'short-1',
+      );
       expect(shortCodeService.UpdateShortCode).not.toHaveBeenCalled();
       expect(materialShortCodeService.Create).not.toHaveBeenCalled();
     });
@@ -154,8 +184,9 @@ describe('MaterialShortCodesController', () => {
       });
 
       // Act & Assert
-      await expect(controller.MapMaterialShortCode('material-1', 'ABC123'))
-        .rejects.toThrow(ConflictException);
+      await expect(
+        controller.MapMaterialShortCode('material-1', 'ABC123'),
+      ).rejects.toThrow(ConflictException);
 
       // Verify the exception contains the proper error structure
       try {
@@ -163,17 +194,21 @@ describe('MaterialShortCodesController', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ConflictException);
         expect(error.getResponse()).toEqual({
-          messages: [{
-            code: 'ALREADY_CONNECTED',
-            parameters: {
-              $type: 'part',
-              id: 'connected-part-id',
+          messages: [
+            {
+              code: 'ALREADY_CONNECTED',
+              parameters: {
+                $type: 'part',
+                id: 'connected-part-id',
+              },
             },
-          }],
+          ],
         });
       }
 
-      expect(shortCodeService.CheckShortCodeConnection).toHaveBeenCalledWith('short-1');
+      expect(shortCodeService.CheckShortCodeConnection).toHaveBeenCalledWith(
+        'short-1',
+      );
       expect(shortCodeService.UpdateShortCode).not.toHaveBeenCalled();
       expect(materialShortCodeService.Create).not.toHaveBeenCalled();
     });

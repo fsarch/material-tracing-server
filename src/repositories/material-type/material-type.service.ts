@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { MaterialType } from "../../database/entities/material_type.entity.js";
-import { IsNull, Repository, Not } from "typeorm";
-import { MaterialTypeCreateDto, MaterialTypeUpdateDto } from "../../models/material-type.model.js";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
-import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { MaterialType } from '../../database/entities/material_type.entity.js';
+import { IsNull, Repository, Not } from 'typeorm';
+import {
+  MaterialTypeCreateDto,
+  MaterialTypeUpdateDto,
+} from '../../models/material-type.model.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
+import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
 
 @Injectable()
 export class MaterialTypeService {
@@ -13,8 +16,7 @@ export class MaterialTypeService {
     @InjectRepository(MaterialType)
     private readonly materialTypeRepository: Repository<MaterialType>,
     private readonly eventEmitter: EventEmitter2,
-  ) {
-  }
+  ) {}
 
   public async CreateMaterialType(createDto: MaterialTypeCreateDto) {
     const createdMaterialType = this.materialTypeRepository.create({
@@ -26,15 +28,20 @@ export class MaterialTypeService {
       archiveTime: createDto.archiveTime,
     });
 
-    const savedMaterialType = await this.materialTypeRepository.save(createdMaterialType);
+    const savedMaterialType =
+      await this.materialTypeRepository.save(createdMaterialType);
 
     return {
       id: savedMaterialType.id,
     };
   }
 
-  public async ListMaterialTypes(isArchived: boolean = false, search?: string): Promise<Array<MaterialType>> {
-    const query = this.materialTypeRepository.createQueryBuilder('material_type');
+  public async ListMaterialTypes(
+    isArchived: boolean = false,
+    search?: string,
+  ): Promise<Array<MaterialType>> {
+    const query =
+      this.materialTypeRepository.createQueryBuilder('material_type');
 
     // Apply archive filter
     if (isArchived) {
@@ -46,17 +53,19 @@ export class MaterialTypeService {
     // Apply search filter
     if (search !== undefined && search !== '') {
       const escapedSearch = escapeSqlWildcards(search);
-      
+
       query.andWhere(
         '(material_type.name ILIKE :search OR material_type.external_id = :exactSearch)',
-        { search: `%${escapedSearch}%`, exactSearch: search }
+        { search: `%${escapedSearch}%`, exactSearch: search },
       );
     }
-    
+
     return query.getMany();
   }
 
-  public async ListByManufacturer(manufacturerId: string): Promise<Array<MaterialType>> {
+  public async ListByManufacturer(
+    manufacturerId: string,
+  ): Promise<Array<MaterialType>> {
     return this.materialTypeRepository.find({
       where: {
         manufacturerId,
@@ -72,13 +81,19 @@ export class MaterialTypeService {
     });
   }
 
-  public async DeleteById(id: string, deletionTime: string = new Date().toISOString()) {
-    await this.materialTypeRepository.update({
-      id,
-      deletionTime: IsNull(),
-    }, {
-      deletionTime,
-    });
+  public async DeleteById(
+    id: string,
+    deletionTime: string = new Date().toISOString(),
+  ) {
+    await this.materialTypeRepository.update(
+      {
+        id,
+        deletionTime: IsNull(),
+      },
+      {
+        deletionTime,
+      },
+    );
 
     this.eventEmitter.emit(EEvent.DELETE_MATERIAL_TYPE, {
       id,
@@ -86,7 +101,10 @@ export class MaterialTypeService {
     });
   }
 
-  public async UpdateMaterialType(id: string, updateDto: MaterialTypeUpdateDto): Promise<void> {
+  public async UpdateMaterialType(
+    id: string,
+    updateDto: MaterialTypeUpdateDto,
+  ): Promise<void> {
     const materialType = await this.GetMaterialType(id);
     if (!materialType) {
       throw new NotFoundException('Material type not found');

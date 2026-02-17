@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ActionService } from './action.service.js';
-import { ModuleConfiguration } from "../../fsarch/configuration/module/module-configuration.module.js";
-import Joi from "joi";
-
+import { ModuleConfiguration } from '../../fsarch/configuration/module/module-configuration.module.js';
+import Joi from 'joi';
 
 const CUSTOM_ACTIONS_SERVER_CONFIG_VALIDATOR = Joi.array().items(
   Joi.object({
@@ -10,14 +9,16 @@ const CUSTOM_ACTIONS_SERVER_CONFIG_VALIDATOR = Joi.array().items(
     name: Joi.string().required(),
     resources: Joi.array()
       .items(
-        Joi.string().valid(
-          'part',
-          'part_type',
-          'material',
-          'material_type',
-          'manufacturer',
-          'short_code',
-        ).required(),
+        Joi.string()
+          .valid(
+            'part',
+            'part_type',
+            'material',
+            'material_type',
+            'manufacturer',
+            'short_code',
+          )
+          .required(),
       )
       .required(),
     action: Joi.object({
@@ -28,7 +29,7 @@ const CUSTOM_ACTIONS_SERVER_CONFIG_VALIDATOR = Joi.array().items(
         type: Joi.string().valid('credential-propagation'),
       }).required(),
     }).required(),
-  })
+  }),
 );
 
 @Module({

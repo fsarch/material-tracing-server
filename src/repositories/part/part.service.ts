@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Part } from "../../database/entities/part.entity.js";
-import { IsNull, Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { PartCreateDto, PartPatchDto } from "../../models/part.model.js";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
-import { PartChildren } from "../../database/entities/part_children.entity.js";
-import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
+import { Part } from '../../database/entities/part.entity.js';
+import { IsNull, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PartCreateDto, PartPatchDto } from '../../models/part.model.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
+import { PartChildren } from '../../database/entities/part_children.entity.js';
+import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
 
 @Injectable()
 export class PartService {
@@ -16,8 +16,7 @@ export class PartService {
     @InjectRepository(PartChildren)
     private readonly partChildrenRepository: Repository<PartChildren>,
     private readonly eventEmitter: EventEmitter2,
-  ) {
-  }
+  ) {}
 
   public async CreatePart(createDto: PartCreateDto) {
     const createdMaterial = this.partRepository.create({
@@ -37,7 +36,10 @@ export class PartService {
     };
   }
 
-  public async UpdatePart(partId: string, patchDto: PartPatchDto): Promise<void> {
+  public async UpdatePart(
+    partId: string,
+    patchDto: PartPatchDto,
+  ): Promise<void> {
     const part = await this.partRepository.findOneOrFail({
       where: { id: partId },
     });
@@ -69,7 +71,13 @@ export class PartService {
     await this.partRepository.save(part);
   }
 
-  public async ListParts(options: { skip?: number, take?: number, name?: string, isArchived?: boolean, search?: string }): Promise<Array<Part>> {
+  public async ListParts(options: {
+    skip?: number;
+    take?: number;
+    name?: string;
+    isArchived?: boolean;
+    search?: string;
+  }): Promise<Array<Part>> {
     const query = this.partRepository.createQueryBuilder('part');
 
     // Apply archive filter (default to non-archived)
@@ -85,18 +93,19 @@ export class PartService {
       const escapedSearch = escapeSqlWildcards(options.search);
 
       // Check if search string is a valid UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const isUuid = uuidRegex.test(options.search);
 
       if (isUuid) {
         query.andWhere(
           '(part.name ILIKE :search OR part.external_id = :exactSearch OR part.part_type_id = :exactSearch)',
-          { search: `%${escapedSearch}%`, exactSearch: options.search }
+          { search: `%${escapedSearch}%`, exactSearch: options.search },
         );
       } else {
         query.andWhere(
           '(part.name ILIKE :search OR part.external_id = :exactSearch)',
-          { search: `%${escapedSearch}%`, exactSearch: options.search }
+          { search: `%${escapedSearch}%`, exactSearch: options.search },
         );
       }
     } else if (options.name !== undefined) {
@@ -126,10 +135,12 @@ export class PartService {
   }
 
   public async GetAvailableAmount(id: string): Promise<number> {
-    const totalAmount = (await this.partRepository.findOneOrFail({
-      where: { id },
-      select: { amount: true },
-    })).amount;
+    const totalAmount = (
+      await this.partRepository.findOneOrFail({
+        where: { id },
+        select: { amount: true },
+      })
+    ).amount;
 
     const childrenPartAmount = await this.partChildrenRepository.sum('amount', {
       childPartId: id,
@@ -146,13 +157,19 @@ export class PartService {
     });
   }
 
-  public async DeletePart(id: string, deletionTime = new Date().toISOString()): Promise<void> {
-    await this.partRepository.update({
-      id,
-      deletionTime: IsNull(),
-    }, {
-      deletionTime,
-    });
+  public async DeletePart(
+    id: string,
+    deletionTime = new Date().toISOString(),
+  ): Promise<void> {
+    await this.partRepository.update(
+      {
+        id,
+        deletionTime: IsNull(),
+      },
+      {
+        deletionTime,
+      },
+    );
 
     this.eventEmitter.emit(EEvent.DELETE_PART, {
       id,

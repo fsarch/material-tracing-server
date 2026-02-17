@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { MaterialShortCode } from "../../database/entities/material_short_code.entity.js";
-import * as crypto from "node:crypto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { MaterialShortCode } from '../../database/entities/material_short_code.entity.js';
+import * as crypto from 'node:crypto';
 
 @Injectable()
 export class MaterialShortCodeService {
   constructor(
     @InjectRepository(MaterialShortCode)
     private readonly materialShortCodeRepository: Repository<MaterialShortCode>,
-  ) {
-  }
+  ) {}
 
   public async Create(materialId: string, shortCodeId: string) {
     const createdMaterialShortCode = this.materialShortCodeRepository.create({
@@ -19,20 +18,26 @@ export class MaterialShortCodeService {
       shortCodeId,
     });
 
-    const savedMaterialShortCode = await this.materialShortCodeRepository.save(createdMaterialShortCode);
+    const savedMaterialShortCode = await this.materialShortCodeRepository.save(
+      createdMaterialShortCode,
+    );
 
     return {
       id: savedMaterialShortCode.id,
     };
   }
 
-  public async ListByMaterialId(materialId: string): Promise<Array<MaterialShortCode>> {
+  public async ListByMaterialId(
+    materialId: string,
+  ): Promise<Array<MaterialShortCode>> {
     return await this.materialShortCodeRepository.find({
       where: { materialId },
     });
   }
 
-  public async ListByShortCodeId(shortCodeId: string): Promise<Array<MaterialShortCode>> {
+  public async ListByShortCodeId(
+    shortCodeId: string,
+  ): Promise<Array<MaterialShortCode>> {
     return await this.materialShortCodeRepository.find({
       where: { shortCodeId },
     });

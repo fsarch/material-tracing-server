@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { PartType } from "../database/entities/part_type.entity.js";
-import { IsOptional } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { PartType } from '../database/entities/part_type.entity.js';
+import { IsOptional } from 'class-validator';
 
 export class PartTypeCreateDto {
   @ApiProperty()

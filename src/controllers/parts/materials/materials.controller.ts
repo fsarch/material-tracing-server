@@ -1,8 +1,16 @@
-import { ConflictException, Controller, Delete, Get, NotFoundException, Param, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { PartService } from "../../../repositories/part/part.service.js";
-import { MaterialService } from "../../../repositories/material/material.service.js";
-import { PartMaterialService } from "../../../repositories/part-material/part-material.service.js";
+import {
+  ConflictException,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { PartService } from '../../../repositories/part/part.service.js';
+import { MaterialService } from '../../../repositories/material/material.service.js';
+import { PartMaterialService } from '../../../repositories/part-material/part-material.service.js';
 
 @ApiTags('parts')
 @Controller({
@@ -15,8 +23,7 @@ export class MaterialsController {
     private readonly partService: PartService,
     private readonly materialService: MaterialService,
     private readonly partMaterialService: PartMaterialService,
-  ) {
-  }
+  ) {}
 
   @Put('/:materialId')
   public async SetMaterialToPart(
@@ -39,9 +46,7 @@ export class MaterialsController {
   }
 
   @Get()
-  public async ListByPart(
-    @Param('partId') partId: string,
-  ) {
+  public async ListByPart(@Param('partId') partId: string) {
     return await this.partMaterialService.ListByPart(partId);
   }
 
@@ -50,7 +55,10 @@ export class MaterialsController {
     @Param('partId') partId: string,
     @Param('materialId') materialId: string,
   ) {
-    const partMaterial = await this.partMaterialService.GetByIds(partId, materialId);
+    const partMaterial = await this.partMaterialService.GetByIds(
+      partId,
+      materialId,
+    );
 
     if (!partMaterial) {
       throw new NotFoundException();

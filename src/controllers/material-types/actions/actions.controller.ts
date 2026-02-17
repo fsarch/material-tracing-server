@@ -1,8 +1,8 @@
 import { Controller, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ActionService } from "../../../repositories/actions/action.service.js";
-import { User } from "../../../fsarch/auth/user.js";
-import { UserData } from "../../../fsarch/auth/decorators/user-data.decorator.js";
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ActionService } from '../../../repositories/actions/action.service.js';
+import { User } from '../../../fsarch/auth/user.js';
+import { UserData } from '../../../fsarch/auth/decorators/user-data.decorator.js';
 
 @ApiTags('material-types')
 @Controller({
@@ -11,11 +11,7 @@ import { UserData } from "../../../fsarch/auth/decorators/user-data.decorator.js
 })
 @ApiBearerAuth()
 export class ActionsController {
-  constructor(
-    private readonly actionService: ActionService,
-  ) {
-
-  }
+  constructor(private readonly actionService: ActionService) {}
 
   @Post(':actionId/_actions/execute')
   public async executeAction(
@@ -23,8 +19,12 @@ export class ActionsController {
     @Param('materialTypeId') materialTypeId: string,
     @UserData() user: User,
   ) {
-    return this.actionService.executeMaterialTypeAction(actionId, materialTypeId, {
-      user,
-    });
+    return this.actionService.executeMaterialTypeAction(
+      actionId,
+      materialTypeId,
+      {
+        user,
+      },
+    );
   }
 }

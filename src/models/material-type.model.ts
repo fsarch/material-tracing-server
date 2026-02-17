@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { MaterialType } from "../database/entities/material_type.entity.js";
-import { IsOptional } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { MaterialType } from '../database/entities/material_type.entity.js';
+import { IsOptional } from 'class-validator';
 
 export class MaterialTypeCreateDto {
   @ApiProperty()

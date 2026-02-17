@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Repository } from "typeorm";
-import { PartMaterial } from "../../database/entities/part_material.entity.js";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Material } from "../../database/entities/material.entity.js";
+import { Repository } from 'typeorm';
+import { PartMaterial } from '../../database/entities/part_material.entity.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Material } from '../../database/entities/material.entity.js';
 
 @Injectable()
 export class PartMaterialService {
@@ -11,10 +11,12 @@ export class PartMaterialService {
   constructor(
     @InjectRepository(PartMaterial)
     private readonly partMaterialRepository: Repository<PartMaterial>,
-  ) {
-  }
+  ) {}
 
-  public async CreateOrGet(partId: string, materialId: string): Promise<{ id: string }> {
+  public async CreateOrGet(
+    partId: string,
+    materialId: string,
+  ): Promise<{ id: string }> {
     const existingPartMaterial = await this.partMaterialRepository.findOneBy({
       partId,
       materialId,
@@ -36,14 +38,18 @@ export class PartMaterialService {
       materialId,
     });
 
-    const savedMaterial = await this.partMaterialRepository.save(createdMaterial);
+    const savedMaterial =
+      await this.partMaterialRepository.save(createdMaterial);
 
     return {
       id: savedMaterial.id,
     };
   }
 
-  public async GetByIds(partId: string, materialId: string): Promise<PartMaterial> {
+  public async GetByIds(
+    partId: string,
+    materialId: string,
+  ): Promise<PartMaterial> {
     return this.partMaterialRepository.findOne({
       where: {
         partId,
@@ -53,7 +59,8 @@ export class PartMaterialService {
   }
 
   public async ListByPart(partId: string): Promise<Array<Material>> {
-    const existingPartMaterial = await this.partMaterialRepository.createQueryBuilder('pm')
+    const existingPartMaterial = await this.partMaterialRepository
+      .createQueryBuilder('pm')
       .leftJoinAndSelect(Material, 'mat', 'pm.material_id = mat.id')
       .select('mat.*')
       .where({

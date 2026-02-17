@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Manufacturer } from "../database/entities/manufacturer.entity.js";
-import { IsOptional } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { Manufacturer } from '../database/entities/manufacturer.entity.js';
+import { IsOptional } from 'class-validator';
 
 export class ManufacturerCreateDto {
   @ApiProperty()

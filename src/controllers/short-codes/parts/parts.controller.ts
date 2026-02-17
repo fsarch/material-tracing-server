@@ -1,10 +1,10 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
-import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
-import { PartShortCodeService } from "../../../repositories/part-short-code/part-short-code.service.js";
-import { PartService } from "../../../repositories/part/part.service.js";
-import { PartDto } from "../../../models/part.model.js";
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ShortCodeType } from '../../../constants/short-code-type.enum.js';
+import { ShortCodeService } from '../../../repositories/short-code/short-code.service.js';
+import { PartShortCodeService } from '../../../repositories/part-short-code/part-short-code.service.js';
+import { PartService } from '../../../repositories/part/part.service.js';
+import { PartDto } from '../../../models/part.model.js';
 
 @ApiTags('parts')
 @Controller({
@@ -17,13 +17,10 @@ export class PartsController {
     private readonly shortCodeService: ShortCodeService,
     private readonly partShortCodeService: PartShortCodeService,
     private readonly partService: PartService,
-  ) {
-  }
+  ) {}
 
   @Get()
-  public async Get(
-    @Param('shortCode') code: string,
-  ) {
+  public async Get(@Param('shortCode') code: string) {
     const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
     if (!shortCode) {
       return new NotFoundException();
@@ -33,21 +30,25 @@ export class PartsController {
       throw new NotFoundException();
     }
 
-    const partShortCodes = await this.partShortCodeService.ListByShortCodeId(shortCode.id);
+    const partShortCodes = await this.partShortCodeService.ListByShortCodeId(
+      shortCode.id,
+    );
     if (!partShortCodes.length) {
       throw new NotFoundException();
     }
 
-    const parts = await Promise.all(partShortCodes.map(async (partShortCode) => {
-      try {
-        const material = await this.partService.GetById(partShortCode.partId);
+    const parts = await Promise.all(
+      partShortCodes.map(async (partShortCode) => {
+        try {
+          const material = await this.partService.GetById(partShortCode.partId);
 
-        return material;
-      } catch (err) {
-        return null;
-      }
-    }));
+          return material;
+        } catch (err) {
+          return null;
+        }
+      }),
+    );
 
-    return parts.filter(m => m).map(PartDto.FromDbo);
+    return parts.filter((m) => m).map(PartDto.FromDbo);
   }
 }

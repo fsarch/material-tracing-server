@@ -8,6 +8,14 @@ import { PartTypesModule } from './part-types/part-types.module.js';
 import { PartsModule } from './parts/parts.module.js';
 
 @Module({
-  imports: [MaterialsModule, MaterialTypesModule, ManufacturersModule, ShortCodesModule, MetaModule, PartTypesModule, PartsModule]
+  imports: [
+    MaterialsModule,
+    MaterialTypesModule,
+    ManufacturersModule,
+    ShortCodesModule,
+    MetaModule,
+    PartTypesModule,
+    PartsModule,
+  ],
 })
 export class ControllersModule {}

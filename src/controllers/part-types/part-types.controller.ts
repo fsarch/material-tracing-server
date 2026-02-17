@@ -1,7 +1,21 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { PartTypeCreateDto, PartTypeDto, PartTypePatchDto } from "../../models/part-type.model.js";
-import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  PartTypeCreateDto,
+  PartTypeDto,
+  PartTypePatchDto,
+} from '../../models/part-type.model.js';
+import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 
 @ApiTags('part-types')
 @Controller({
@@ -10,10 +24,7 @@ import { PartTypeService } from "../../repositories/part-type/part-type.service.
 })
 @ApiBearerAuth()
 export class PartTypesController {
-  constructor(
-    private readonly partTypeService: PartTypeService,
-  ) {
-  }
+  constructor(private readonly partTypeService: PartTypeService) {}
 
   @Post()
   public async Create(@Body() partTypeCreateDto: PartTypeCreateDto) {
@@ -37,7 +48,10 @@ export class PartTypesController {
     @Query('isArchived') isArchived?: boolean,
     @Query('search') search?: string,
   ): Promise<Array<PartTypeDto>> {
-    const partTypes = await this.partTypeService.ListPartTypes(isArchived ?? false, search);
+    const partTypes = await this.partTypeService.ListPartTypes(
+      isArchived ?? false,
+      search,
+    );
 
     return partTypes.map(PartTypeDto.FromDbo);
   }
@@ -65,13 +79,14 @@ export class PartTypesController {
       throw new NotFoundException();
     }
 
-    return await this.partTypeService.UpdatePartType(partTypeId, partTypePatchDto);
+    return await this.partTypeService.UpdatePartType(
+      partTypeId,
+      partTypePatchDto,
+    );
   }
 
   @Delete('/:partTypeId')
-  public async Delete(
-    @Param('partTypeId') partTypeId: string,
-  ): Promise<void> {
+  public async Delete(@Param('partTypeId') partTypeId: string): Promise<void> {
     await this.partTypeService.Delete(partTypeId);
   }
 }

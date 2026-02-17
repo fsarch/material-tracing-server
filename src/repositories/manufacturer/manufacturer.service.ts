@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Manufacturer } from "../../database/entities/manufacturer.entity.js";
-import { InjectRepository } from "@nestjs/typeorm";
-import { IsNull, Repository } from "typeorm";
-import { ManufacturerCreateDto, ManufacturerUpdateDto } from "../../models/manufacturer.model.js";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
-import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
+import { Manufacturer } from '../../database/entities/manufacturer.entity.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IsNull, Repository } from 'typeorm';
+import {
+  ManufacturerCreateDto,
+  ManufacturerUpdateDto,
+} from '../../models/manufacturer.model.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
+import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
 
 @Injectable()
 export class ManufacturerService {
@@ -23,23 +26,27 @@ export class ManufacturerService {
       hint: createDto.hint,
     });
 
-    const savedManufacturer = await this.manufacturerRepository.save(createdManufacturer);
+    const savedManufacturer =
+      await this.manufacturerRepository.save(createdManufacturer);
 
     return {
       id: savedManufacturer.id,
     };
   }
 
-  public async ListManufacturers(search?: string): Promise<Array<Manufacturer>> {
-    const query = this.manufacturerRepository.createQueryBuilder('manufacturer');
+  public async ListManufacturers(
+    search?: string,
+  ): Promise<Array<Manufacturer>> {
+    const query =
+      this.manufacturerRepository.createQueryBuilder('manufacturer');
 
     // Apply search filter
     if (search !== undefined && search !== '') {
       const escapedSearch = escapeSqlWildcards(search);
-      
+
       query.andWhere(
         '(manufacturer.name ILIKE :search OR manufacturer.external_id = :exactSearch)',
-        { search: `%${escapedSearch}%`, exactSearch: search }
+        { search: `%${escapedSearch}%`, exactSearch: search },
       );
     }
 
@@ -57,12 +64,15 @@ export class ManufacturerService {
   public async DeleteManufacturer(id: string) {
     const deletionTime = new Date();
 
-    await this.manufacturerRepository.update({
-      id,
-      deletionTime: IsNull(),
-    }, {
-      deletionTime,
-    });
+    await this.manufacturerRepository.update(
+      {
+        id,
+        deletionTime: IsNull(),
+      },
+      {
+        deletionTime,
+      },
+    );
 
     this.eventEmitter.emit(EEvent.DELETE_MANUFACTURER, {
       id,
@@ -70,7 +80,10 @@ export class ManufacturerService {
     });
   }
 
-  public async UpdateManufacturer(id: string, updateDto: ManufacturerUpdateDto): Promise<void> {
+  public async UpdateManufacturer(
+    id: string,
+    updateDto: ManufacturerUpdateDto,
+  ): Promise<void> {
     const manufacturer = await this.GetManufacturerById(id);
     if (!manufacturer) {
       throw new NotFoundException('Manufacturer not found');

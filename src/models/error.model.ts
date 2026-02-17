@@ -8,9 +8,7 @@ export interface ApiErrorResponse {
 }
 
 export class ApiError {
-  constructor(
-    public readonly messages: ErrorMessage[],
-  ) {}
+  constructor(public readonly messages: ErrorMessage[]) {}
 
   static alreadyConnected(type: 'part' | 'material', id: string): ApiError {
     return new ApiError([

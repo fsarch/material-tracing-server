@@ -1,14 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ShortCode } from "../../database/entities/short_code.entity.js";
-import { MaterialShortCode } from "../../database/entities/material_short_code.entity.js";
-import { PartShortCode } from "../../database/entities/part_short_code.entity.js";
-import * as crypto from "node:crypto";
-import { customAlphabet } from "nanoid";
-import { ShortCodeType } from "../../constants/short-code-type.enum.js";
-import { ShortCodeCreateDto, ShortCodeUpdateDto } from "../../models/short-code.model.js";
-import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ShortCode } from '../../database/entities/short_code.entity.js';
+import { MaterialShortCode } from '../../database/entities/material_short_code.entity.js';
+import { PartShortCode } from '../../database/entities/part_short_code.entity.js';
+import * as crypto from 'node:crypto';
+import { customAlphabet } from 'nanoid';
+import { ShortCodeType } from '../../constants/short-code-type.enum.js';
+import {
+  ShortCodeCreateDto,
+  ShortCodeUpdateDto,
+} from '../../models/short-code.model.js';
+import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
 
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
@@ -32,8 +35,7 @@ export class ShortCodeService {
     private readonly materialShortCodeRepository: Repository<MaterialShortCode>,
     @InjectRepository(PartShortCode)
     private readonly partShortCodeRepository: Repository<PartShortCode>,
-  ) {
-  }
+  ) {}
 
   public async CreateShortCode() {
     const createdShortCode = this.shortCodeRepository.create({
@@ -41,7 +43,8 @@ export class ShortCodeService {
       code: nanoid(),
     });
 
-    const savedShortCode = await this.shortCodeRepository.save(createdShortCode);
+    const savedShortCode =
+      await this.shortCodeRepository.save(createdShortCode);
 
     return {
       id: savedShortCode.id,
@@ -57,14 +60,17 @@ export class ShortCodeService {
       hint: createDto.hint,
     });
 
-    const savedShortCode = await this.shortCodeRepository.save(createdShortCode);
+    const savedShortCode =
+      await this.shortCodeRepository.save(createdShortCode);
 
     return {
       id: savedShortCode.id,
     };
   }
 
-  public async ListShortCodes(selectOptions: TListShortCodeOptions): Promise<Array<ShortCode>> {
+  public async ListShortCodes(
+    selectOptions: TListShortCodeOptions,
+  ): Promise<Array<ShortCode>> {
     const query = this.shortCodeRepository.createQueryBuilder('short_code');
 
     if (selectOptions.shortCodeTypeId) {
@@ -76,7 +82,7 @@ export class ShortCodeService {
     // Apply search filter for code field
     if (selectOptions.search !== undefined && selectOptions.search !== '') {
       const escapedSearch = escapeSqlWildcards(selectOptions.search);
-      
+
       query.andWhere('short_code.code ILIKE :search', {
         search: `%${escapedSearch}%`,
       });
@@ -99,7 +105,10 @@ export class ShortCodeService {
     });
   }
 
-  public async UpdateShortCode(id: string, updateDto: { shortCodeTypeId: ShortCodeType }): Promise<void> {
+  public async UpdateShortCode(
+    id: string,
+    updateDto: { shortCodeTypeId: ShortCodeType },
+  ): Promise<void> {
     const shortCode = await this.shortCodeRepository.findOne({
       where: { id },
     });
@@ -109,7 +118,10 @@ export class ShortCodeService {
     await this.shortCodeRepository.save(shortCode);
   }
 
-  public async UpdateShortCodeHint(id: string, updateDto: ShortCodeUpdateDto): Promise<void> {
+  public async UpdateShortCodeHint(
+    id: string,
+    updateDto: ShortCodeUpdateDto,
+  ): Promise<void> {
     const shortCode = await this.shortCodeRepository.findOne({
       where: { id },
     });
@@ -130,7 +142,9 @@ export class ShortCodeService {
    * @param shortCodeId The ID of the short code to check
    * @returns Connection information if connected, null if not connected
    */
-  public async CheckShortCodeConnection(shortCodeId: string): Promise<TShortCodeConnection> {
+  public async CheckShortCodeConnection(
+    shortCodeId: string,
+  ): Promise<TShortCodeConnection> {
     // Check for material connections
     const materialConnection = await this.materialShortCodeRepository.findOne({
       where: { shortCodeId },

@@ -1,10 +1,18 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { PartService } from "../../../repositories/part/part.service.js";
-import { PartPartCreateDto } from "../../../models/part-part.model.js";
-import { PartPartService } from "../../../repositories/part-part/part-part.service.js";
-import { OnEvent } from "@nestjs/event-emitter";
-import { EEvent } from "../../../constants/event.enum.js";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { PartService } from '../../../repositories/part/part.service.js';
+import { PartPartCreateDto } from '../../../models/part-part.model.js';
+import { PartPartService } from '../../../repositories/part-part/part-part.service.js';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EEvent } from '../../../constants/event.enum.js';
 
 @ApiTags('parts')
 @Controller({
@@ -16,8 +24,7 @@ export class PartsController {
   constructor(
     private readonly partService: PartService,
     private readonly partPartService: PartPartService,
-  ) {
-  }
+  ) {}
 
   @Post('/:childPartId')
   public async SetPartAmount(
@@ -41,9 +48,7 @@ export class PartsController {
   }
 
   @Get()
-  public async GetParts(
-    @Param('partId') partId: string,
-  ) {
+  public async GetParts(@Param('partId') partId: string) {
     const parts = await this.partPartService.List(partId);
 
     return parts;
@@ -64,7 +69,10 @@ export class PartsController {
   }
 
   @OnEvent(EEvent.DELETE_PART)
-  public async DeletePartsByPart(payload: { id: string, deletionTime: string }) {
+  public async DeletePartsByPart(payload: {
+    id: string;
+    deletionTime: string;
+  }) {
     const parts = await this.partPartService.List(payload.id);
     for (let part of parts) {
       await this.partPartService.DeleteByPartId(part.id, payload.deletionTime);

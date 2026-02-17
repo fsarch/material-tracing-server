@@ -1,10 +1,24 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { PartTypeService } from "../../repositories/part-type/part-type.service.js";
-import { PartService } from "../../repositories/part/part.service.js";
-import { PartCreateDto, PartDto, PartPatchDto } from "../../models/part.model.js";
-import { OnEvent } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
+import { PartService } from '../../repositories/part/part.service.js';
+import {
+  PartCreateDto,
+  PartDto,
+  PartPatchDto,
+} from '../../models/part.model.js';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
 
 @ApiTags('parts')
 @Controller({
@@ -16,8 +30,7 @@ export class PartsController {
   constructor(
     private readonly partTypeService: PartTypeService,
     private readonly partService: PartService,
-  ) {
-  }
+  ) {}
 
   @Get()
   @ApiQuery({
@@ -36,7 +49,8 @@ export class PartsController {
     name: 'name',
     type: String,
     required: false,
-    description: 'Filter parts by name (case-insensitive, partial matching). Note: search parameter takes precedence if both are provided.',
+    description:
+      'Filter parts by name (case-insensitive, partial matching). Note: search parameter takes precedence if both are provided.',
   })
   @ApiQuery({
     name: 'search',
@@ -109,8 +123,9 @@ export class PartsController {
 
     return await this.partService.CreatePart({
       ...partCreateDto,
-      name: partCreateDto.name
-        || `${partType.name} (${new Intl.DateTimeFormat('de', { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Berlin", }).format(new Date())})`,
+      name:
+        partCreateDto.name ||
+        `${partType.name} (${new Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Berlin' }).format(new Date())})`,
     });
   }
 
@@ -129,9 +144,7 @@ export class PartsController {
   }
 
   @Delete('/:partId')
-  public async Delete(
-    @Param('partId') partId: string,
-  ) {
+  public async Delete(@Param('partId') partId: string) {
     const part = await this.partService.GetById(partId);
 
     if (!part) {
@@ -142,7 +155,10 @@ export class PartsController {
   }
 
   @OnEvent(EEvent.DELETE_PART_TYPE)
-  public async DeletePartsByPartType(payload: { id: string, datetime: string }) {
+  public async DeletePartsByPartType(payload: {
+    id: string;
+    datetime: string;
+  }) {
     const parts = await this.partService.ListPartsByPartType(payload.id);
     for (let part of parts) {
       await this.partService.DeletePart(part.id);

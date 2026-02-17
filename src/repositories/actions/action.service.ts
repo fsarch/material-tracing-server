@@ -1,6 +1,12 @@
-import { Inject, Injectable, Logger, NotFoundException, NotImplementedException } from '@nestjs/common';
-import { ModuleConfigurationService } from "../../fsarch/configuration/module/module-configuration.service.js";
-import { User } from "../../fsarch/auth/user.js";
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  NotImplementedException,
+} from '@nestjs/common';
+import { ModuleConfigurationService } from '../../fsarch/configuration/module/module-configuration.service.js';
+import { User } from '../../fsarch/auth/user.js';
 
 type TCustomActionConfig = {
   id: string;
@@ -13,7 +19,14 @@ type TCustomActionConfig = {
       type: 'credential-propagation';
     };
   };
-  resources: Array<'part' | 'part_type' | 'material' | 'material_type' | 'short_code' | 'manufacturer'>;
+  resources: Array<
+    | 'part'
+    | 'part_type'
+    | 'material'
+    | 'material_type'
+    | 'short_code'
+    | 'manufacturer'
+  >;
 };
 
 @Injectable()
@@ -22,7 +35,9 @@ export class ActionService {
 
   constructor(
     @Inject('CUSTOM_ACTIONS_SERVER_CONFIG')
-    private readonly customActionConfig: ModuleConfigurationService<Array<TCustomActionConfig>>,
+    private readonly customActionConfig: ModuleConfigurationService<
+      Array<TCustomActionConfig>
+    >,
   ) {}
 
   public async getPublicCustomActionDefinition() {
@@ -34,15 +49,14 @@ export class ActionService {
   }
 
   public async getCustomAction(actionId: string) {
-    return this.customActionConfig.get()
-      .find((c) => c.id === actionId);
+    return this.customActionConfig.get().find((c) => c.id === actionId);
   }
 
   private async executeAction(
     action: TCustomActionConfig,
     payload: unknown,
     options: {
-      user: User,
+      user: User;
     },
   ): Promise<{ success: true; result: unknown } | { success: false }> {
     if (action.action.auth.type !== 'credential-propagation') {
@@ -51,7 +65,10 @@ export class ActionService {
 
     const accessToken = options.user.getAccessToken();
 
-    const url = new URL(`/v1/functions/${action.action.id}/executions?wait=true`, action.action.server_url);
+    const url = new URL(
+      `/v1/functions/${action.action.id}/executions?wait=true`,
+      action.action.server_url,
+    );
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -80,75 +97,123 @@ export class ActionService {
     };
   }
 
-  public async executePartAction(actionId: string, partId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+  public async executePartAction(
+    actionId: string,
+    partId: string,
+    options: { user: User },
+  ): Promise<{ success: true; result: unknown } | { success: false }> {
     const action = await this.getCustomAction(actionId);
 
     if (!action.resources.includes('part')) {
       throw new NotFoundException();
     }
 
-    return this.executeAction(action, {
-      id: partId,
-    }, options);
+    return this.executeAction(
+      action,
+      {
+        id: partId,
+      },
+      options,
+    );
   }
 
-  public async executePartTypeAction(actionId: string, partTypeId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+  public async executePartTypeAction(
+    actionId: string,
+    partTypeId: string,
+    options: { user: User },
+  ): Promise<{ success: true; result: unknown } | { success: false }> {
     const action = await this.getCustomAction(actionId);
 
     if (!action.resources.includes('part_type')) {
       throw new NotFoundException();
     }
 
-    return this.executeAction(action, {
-      id: partTypeId,
-    }, options);
+    return this.executeAction(
+      action,
+      {
+        id: partTypeId,
+      },
+      options,
+    );
   }
 
-  public async executeMaterialAction(actionId: string, materialId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+  public async executeMaterialAction(
+    actionId: string,
+    materialId: string,
+    options: { user: User },
+  ): Promise<{ success: true; result: unknown } | { success: false }> {
     const action = await this.getCustomAction(actionId);
 
     if (!action.resources.includes('material')) {
       throw new NotFoundException();
     }
 
-    return this.executeAction(action, {
-      id: materialId,
-    }, options);
+    return this.executeAction(
+      action,
+      {
+        id: materialId,
+      },
+      options,
+    );
   }
 
-  public async executeMaterialTypeAction(actionId: string, materialTypeId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+  public async executeMaterialTypeAction(
+    actionId: string,
+    materialTypeId: string,
+    options: { user: User },
+  ): Promise<{ success: true; result: unknown } | { success: false }> {
     const action = await this.getCustomAction(actionId);
 
     if (!action.resources.includes('material_type')) {
       throw new NotFoundException();
     }
 
-    return this.executeAction(action, {
-      id: materialTypeId,
-    }, options);
+    return this.executeAction(
+      action,
+      {
+        id: materialTypeId,
+      },
+      options,
+    );
   }
 
-  public async executeShortCodeAction(actionId: string, shortCodeId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+  public async executeShortCodeAction(
+    actionId: string,
+    shortCodeId: string,
+    options: { user: User },
+  ): Promise<{ success: true; result: unknown } | { success: false }> {
     const action = await this.getCustomAction(actionId);
 
     if (!action.resources.includes('short_code')) {
       throw new NotFoundException();
     }
 
-    return this.executeAction(action, {
-      id: shortCodeId,
-    }, options);
+    return this.executeAction(
+      action,
+      {
+        id: shortCodeId,
+      },
+      options,
+    );
   }
 
-  public async executeManufacturerAction(actionId: string, manufacturerId: string, options: { user: User }): Promise<{ success: true; result: unknown } | { success: false }> {
+  public async executeManufacturerAction(
+    actionId: string,
+    manufacturerId: string,
+    options: { user: User },
+  ): Promise<{ success: true; result: unknown } | { success: false }> {
     const action = await this.getCustomAction(actionId);
 
     if (!action.resources.includes('manufacturer')) {
       throw new NotFoundException();
     }
 
-    return this.executeAction(action, {
-      id: manufacturerId,
-    }, options);
+    return this.executeAction(
+      action,
+      {
+        id: manufacturerId,
+      },
+      options,
+    );
   }
 }

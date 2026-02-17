@@ -205,7 +205,11 @@ describe('PartsController', () => {
     it('should return empty array when no parts match the name filter', async () => {
       partService.ListParts.mockResolvedValue([]);
 
-      const result = await controller.List(undefined, undefined, 'NonExistentPart');
+      const result = await controller.List(
+        undefined,
+        undefined,
+        'NonExistentPart',
+      );
 
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: undefined,
@@ -219,7 +223,11 @@ describe('PartsController', () => {
       partService.ListParts.mockResolvedValue([]);
 
       // Test with wildcard characters that should be escaped
-      const result = await controller.List(undefined, undefined, '%_wildcards%');
+      const result = await controller.List(
+        undefined,
+        undefined,
+        '%_wildcards%',
+      );
 
       expect(partService.ListParts).toHaveBeenCalledWith({
         skip: undefined,

@@ -40,7 +40,7 @@ export class McpService {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     // Register tools
@@ -102,7 +102,8 @@ export class McpService {
               },
               status: {
                 type: 'string',
-                description: 'Filter by status: all, active, archived, or checked-out',
+                description:
+                  'Filter by status: all, active, archived, or checked-out',
                 enum: ['all', 'active', 'archived', 'checked-out'],
               },
             },
@@ -131,7 +132,8 @@ export class McpService {
             properties: {
               search: {
                 type: 'string',
-                description: 'Search term for material type name or external ID',
+                description:
+                  'Search term for material type name or external ID',
               },
               status: {
                 type: 'string',
@@ -168,7 +170,8 @@ export class McpService {
               },
               status: {
                 type: 'string',
-                description: 'Filter by status: all, active, archived, or checked-out',
+                description:
+                  'Filter by status: all, active, archived, or checked-out',
                 enum: ['all', 'active', 'archived', 'checked-out'],
               },
             },
@@ -324,7 +327,7 @@ export class McpService {
   // Manufacturers
   private async searchManufacturers(args: { search?: string }) {
     const manufacturers = await this.manufacturerService.ListManufacturers(
-      args.search
+      args.search,
     );
 
     return {
@@ -339,7 +342,7 @@ export class McpService {
 
   private async getManufacturer(args: { id: string }) {
     const manufacturer = await this.manufacturerService.GetManufacturerById(
-      args.id
+      args.id,
     );
 
     if (!manufacturer) {
@@ -365,14 +368,22 @@ export class McpService {
   }
 
   // Materials
-  private async searchMaterials(args: { search?: string; status?: ResourceStatus }) {
+  private async searchMaterials(args: {
+    search?: string;
+    status?: ResourceStatus;
+  }) {
     const status = args.status || 'active';
-    
+
     if (status === 'checked-out') {
       // Get all materials and filter by checkout status
-      const allMaterials = await this.materialService.ListMaterials(false, args.search);
-      const checkedOutMaterials = allMaterials.filter(m => m.checkoutTime !== null);
-      
+      const allMaterials = await this.materialService.ListMaterials(
+        false,
+        args.search,
+      );
+      const checkedOutMaterials = allMaterials.filter(
+        (m) => m.checkoutTime !== null,
+      );
+
       return {
         content: [
           {
@@ -389,9 +400,9 @@ export class McpService {
         this.materialService.ListMaterials(false, args.search),
         this.materialService.ListMaterials(true, args.search),
       ]);
-      
+
       const allMaterials = [...activeMaterials, ...archivedMaterials];
-      
+
       return {
         content: [
           {
@@ -404,7 +415,7 @@ export class McpService {
 
     const materials = await this.materialService.ListMaterials(
       status === 'archived',
-      args.search
+      args.search,
     );
 
     return {
@@ -443,18 +454,24 @@ export class McpService {
   }
 
   // Material Types
-  private async searchMaterialTypes(args: { search?: string; status?: ResourceStatus }) {
+  private async searchMaterialTypes(args: {
+    search?: string;
+    status?: ResourceStatus;
+  }) {
     const status = args.status || 'active';
-    
+
     if (status === 'all') {
       // Get both archived and non-archived material types
       const [activeMaterialTypes, archivedMaterialTypes] = await Promise.all([
         this.materialTypeService.ListMaterialTypes(false, args.search),
         this.materialTypeService.ListMaterialTypes(true, args.search),
       ]);
-      
-      const allMaterialTypes = [...activeMaterialTypes, ...archivedMaterialTypes];
-      
+
+      const allMaterialTypes = [
+        ...activeMaterialTypes,
+        ...archivedMaterialTypes,
+      ];
+
       return {
         content: [
           {
@@ -467,7 +484,7 @@ export class McpService {
 
     const materialTypes = await this.materialTypeService.ListMaterialTypes(
       status === 'archived',
-      args.search
+      args.search,
     );
 
     return {
@@ -482,7 +499,7 @@ export class McpService {
 
   private async getMaterialType(args: { id: string }) {
     const materialType = await this.materialTypeService.GetMaterialType(
-      args.id
+      args.id,
     );
 
     if (!materialType) {
@@ -508,14 +525,20 @@ export class McpService {
   }
 
   // Parts
-  private async searchParts(args: { search?: string; status?: ResourceStatus }) {
+  private async searchParts(args: {
+    search?: string;
+    status?: ResourceStatus;
+  }) {
     const status = args.status || 'active';
-    
+
     if (status === 'checked-out') {
       // Get all parts and filter by checkout status
-      const allParts = await this.partService.ListParts({ isArchived: false, search: args.search });
-      const checkedOutParts = allParts.filter(p => p.checkoutTime !== null);
-      
+      const allParts = await this.partService.ListParts({
+        isArchived: false,
+        search: args.search,
+      });
+      const checkedOutParts = allParts.filter((p) => p.checkoutTime !== null);
+
       return {
         content: [
           {
@@ -532,9 +555,9 @@ export class McpService {
         this.partService.ListParts({ isArchived: false, search: args.search }),
         this.partService.ListParts({ isArchived: true, search: args.search }),
       ]);
-      
+
       const allParts = [...activeParts, ...archivedParts];
-      
+
       return {
         content: [
           {
@@ -586,18 +609,21 @@ export class McpService {
   }
 
   // Part Types
-  private async searchPartTypes(args: { search?: string; status?: ResourceStatus }) {
+  private async searchPartTypes(args: {
+    search?: string;
+    status?: ResourceStatus;
+  }) {
     const status = args.status || 'active';
-    
+
     if (status === 'all') {
       // Get both archived and non-archived part types
       const [activePartTypes, archivedPartTypes] = await Promise.all([
         this.partTypeService.ListPartTypes(false, args.search),
         this.partTypeService.ListPartTypes(true, args.search),
       ]);
-      
+
       const allPartTypes = [...activePartTypes, ...archivedPartTypes];
-      
+
       return {
         content: [
           {
@@ -610,7 +636,7 @@ export class McpService {
 
     const partTypes = await this.partTypeService.ListPartTypes(
       status === 'archived',
-      args.search
+      args.search,
     );
 
     return {

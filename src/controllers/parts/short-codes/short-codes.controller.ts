@@ -1,9 +1,17 @@
-import { ConflictException, Controller, Delete, Get, NotFoundException, Param, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
-import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
-import { PartShortCodeService } from "../../../repositories/part-short-code/part-short-code.service.js";
-import { ApiError } from "../../../models/error.model.js";
+import {
+  ConflictException,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ShortCodeService } from '../../../repositories/short-code/short-code.service.js';
+import { ShortCodeType } from '../../../constants/short-code-type.enum.js';
+import { PartShortCodeService } from '../../../repositories/part-short-code/part-short-code.service.js';
+import { ApiError } from '../../../models/error.model.js';
 
 @ApiTags('short-code')
 @Controller({
@@ -15,23 +23,25 @@ export class PartShortCodesController {
   constructor(
     private readonly shortCodeService: ShortCodeService,
     private readonly partShortCodeService: PartShortCodeService,
-  ) {
-  }
+  ) {}
 
   @Get()
-  public async ListShortCodes(
-    @Param('partId') partId: string,
-  ) {
-    const materialShortCodes = await this.partShortCodeService.ListByPartId(partId);
+  public async ListShortCodes(@Param('partId') partId: string) {
+    const materialShortCodes =
+      await this.partShortCodeService.ListByPartId(partId);
     if (!materialShortCodes.length) {
       return [];
     }
 
-    return Promise.all(materialShortCodes.map(async (materialShortCode) => {
-      const shortCode = await this.shortCodeService.GetShortCode(materialShortCode.shortCodeId);
+    return Promise.all(
+      materialShortCodes.map(async (materialShortCode) => {
+        const shortCode = await this.shortCodeService.GetShortCode(
+          materialShortCode.shortCodeId,
+        );
 
-      return shortCode;
-    }));
+        return shortCode;
+      }),
+    );
   }
 
   @Put('/:shortCode')
@@ -39,7 +49,8 @@ export class PartShortCodesController {
     @Param('partId') partId: string,
     @Param('shortCode') code: string,
   ) {
-    const materialShortCodes = await this.partShortCodeService.ListByPartId(partId);
+    const materialShortCodes =
+      await this.partShortCodeService.ListByPartId(partId);
     if (materialShortCodes.length) {
       throw new ConflictException();
     }
@@ -50,9 +61,13 @@ export class PartShortCodesController {
     }
 
     // Check if the short code is already connected to another resource
-    const existingConnection = await this.shortCodeService.CheckShortCodeConnection(shortCode.id);
+    const existingConnection =
+      await this.shortCodeService.CheckShortCodeConnection(shortCode.id);
     if (existingConnection) {
-      const error = ApiError.alreadyConnected(existingConnection.type, existingConnection.id);
+      const error = ApiError.alreadyConnected(
+        existingConnection.type,
+        existingConnection.id,
+      );
       throw new ConflictException(error.toResponse());
     }
 
@@ -75,8 +90,11 @@ export class PartShortCodesController {
       throw new NotFoundException();
     }
 
-    const materialShortCodes = await this.partShortCodeService.ListByPartId(partId);
-    const foundShortCode = materialShortCodes.find(msc => msc.shortCodeId === shortCode.id && msc.partId === partId)
+    const materialShortCodes =
+      await this.partShortCodeService.ListByPartId(partId);
+    const foundShortCode = materialShortCodes.find(
+      (msc) => msc.shortCodeId === shortCode.id && msc.partId === partId,
+    );
     if (!foundShortCode) {
       throw new ConflictException();
     }

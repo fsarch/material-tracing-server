@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { PartChildren } from "../../database/entities/part_children.entity.js";
-import { IsNull, Repository } from "typeorm";
-import { Part } from "../../database/entities/part.entity.js";
-import { Material } from "../../database/entities/material.entity.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { PartChildren } from '../../database/entities/part_children.entity.js';
+import { IsNull, Repository } from 'typeorm';
+import { Part } from '../../database/entities/part.entity.js';
+import { Material } from '../../database/entities/material.entity.js';
 
 @Injectable()
 export class PartPartService {
   constructor(
     @InjectRepository(PartChildren)
     private readonly partChildrenRepository: Repository<PartChildren>,
-  ) {
-  }
+  ) {}
 
   public async GetOrAdd(partId: string, childPartId: string, amount: number) {
     const existingPartChild = await this.partChildrenRepository.findOneBy({
@@ -34,14 +33,18 @@ export class PartPartService {
       amount,
     });
 
-    const savedPartChild = await this.partChildrenRepository.save(createdPartChild);
+    const savedPartChild =
+      await this.partChildrenRepository.save(createdPartChild);
 
     return {
       id: savedPartChild.id,
     };
   }
 
-  public async GetById(partId: string, childPartId: string): Promise<PartChildren> {
+  public async GetById(
+    partId: string,
+    childPartId: string,
+  ): Promise<PartChildren> {
     return await this.partChildrenRepository.findOne({
       where: {
         partId,
@@ -51,7 +54,8 @@ export class PartPartService {
   }
 
   public async List(partId: string): Promise<Array<Part>> {
-    const childParts = await this.partChildrenRepository.createQueryBuilder('pc')
+    const childParts = await this.partChildrenRepository
+      .createQueryBuilder('pc')
       .where({
         partId: partId,
       })
@@ -70,12 +74,18 @@ export class PartPartService {
     });
   }
 
-  public async DeleteByPartId(partId: string, deletionTime = new Date().toISOString()) {
-    await this.partChildrenRepository.update({
-      partId,
-      deletionTime: IsNull(),
-    }, {
-      deletionTime,
-    });
+  public async DeleteByPartId(
+    partId: string,
+    deletionTime = new Date().toISOString(),
+  ) {
+    await this.partChildrenRepository.update(
+      {
+        partId,
+        deletionTime: IsNull(),
+      },
+      {
+        deletionTime,
+      },
+    );
   }
 }

@@ -1,8 +1,20 @@
-import { Controller, Get, NotFoundException, Param, Post, Query, Patch, Body } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { ShortCodeService } from "../../repositories/short-code/short-code.service.js";
-import { ShortCodeDto, ShortCodeUpdateDto } from "../../models/short-code.model.js";
-import { ShortCodeType } from "../../constants/short-code-type.enum.js";
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  Patch,
+  Body,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ShortCodeService } from '../../repositories/short-code/short-code.service.js';
+import {
+  ShortCodeDto,
+  ShortCodeUpdateDto,
+} from '../../models/short-code.model.js';
+import { ShortCodeType } from '../../constants/short-code-type.enum.js';
 
 @ApiTags('short-code')
 @Controller({
@@ -11,10 +23,7 @@ import { ShortCodeType } from "../../constants/short-code-type.enum.js";
 })
 @ApiBearerAuth()
 export class ShortCodesController {
-  constructor(
-    private readonly shortCodeService: ShortCodeService,
-  ) {
-  }
+  constructor(private readonly shortCodeService: ShortCodeService) {}
 
   @Post()
   public async CreateShortCode() {
@@ -57,7 +66,10 @@ export class ShortCodesController {
   }
 
   @Patch(':code')
-  public async UpdateShortCode(@Param('code') code: string, @Body() updateDto: ShortCodeUpdateDto) {
+  public async UpdateShortCode(
+    @Param('code') code: string,
+    @Body() updateDto: ShortCodeUpdateDto,
+  ) {
     const shortCode = await this.shortCodeService.GetShortCodeByCode(code);
     if (!shortCode) {
       throw new NotFoundException();

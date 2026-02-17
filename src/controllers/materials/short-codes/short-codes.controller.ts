@@ -1,11 +1,19 @@
-import { ConflictException, Controller, Delete, Get, NotFoundException, Param, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ShortCodeService } from "../../../repositories/short-code/short-code.service.js";
-import { ShortCodeType } from "../../../constants/short-code-type.enum.js";
-import { MaterialShortCodeService } from "../../../repositories/material-short-code/material-short-code.service.js";
-import { OnEvent } from "@nestjs/event-emitter";
-import { EEvent } from "../../../constants/event.enum.js";
-import { ApiError } from "../../../models/error.model.js";
+import {
+  ConflictException,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ShortCodeService } from '../../../repositories/short-code/short-code.service.js';
+import { ShortCodeType } from '../../../constants/short-code-type.enum.js';
+import { MaterialShortCodeService } from '../../../repositories/material-short-code/material-short-code.service.js';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EEvent } from '../../../constants/event.enum.js';
+import { ApiError } from '../../../models/error.model.js';
 
 @ApiTags('short-code')
 @Controller({
@@ -17,23 +25,25 @@ export class MaterialShortCodesController {
   constructor(
     private readonly shortCodeService: ShortCodeService,
     private readonly materialShortCodeService: MaterialShortCodeService,
-  ) {
-  }
+  ) {}
 
   @Get()
-  public async ListShortCodes(
-    @Param('materialId') materialId: string,
-  ) {
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
+  public async ListShortCodes(@Param('materialId') materialId: string) {
+    const materialShortCodes =
+      await this.materialShortCodeService.ListByMaterialId(materialId);
     if (!materialShortCodes.length) {
       return [];
     }
 
-    return Promise.all(materialShortCodes.map(async (materialShortCode) => {
-      const shortCode = await this.shortCodeService.GetShortCode(materialShortCode.shortCodeId);
+    return Promise.all(
+      materialShortCodes.map(async (materialShortCode) => {
+        const shortCode = await this.shortCodeService.GetShortCode(
+          materialShortCode.shortCodeId,
+        );
 
-      return shortCode;
-    }));
+        return shortCode;
+      }),
+    );
   }
 
   @Put('/:shortCode')
@@ -41,7 +51,8 @@ export class MaterialShortCodesController {
     @Param('materialId') materialId: string,
     @Param('shortCode') code: string,
   ) {
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
+    const materialShortCodes =
+      await this.materialShortCodeService.ListByMaterialId(materialId);
     if (materialShortCodes.length) {
       throw new ConflictException();
     }
@@ -52,9 +63,13 @@ export class MaterialShortCodesController {
     }
 
     // Check if the short code is already connected to another resource
-    const existingConnection = await this.shortCodeService.CheckShortCodeConnection(shortCode.id);
+    const existingConnection =
+      await this.shortCodeService.CheckShortCodeConnection(shortCode.id);
     if (existingConnection) {
-      const error = ApiError.alreadyConnected(existingConnection.type, existingConnection.id);
+      const error = ApiError.alreadyConnected(
+        existingConnection.type,
+        existingConnection.id,
+      );
       throw new ConflictException(error.toResponse());
     }
 
@@ -77,8 +92,12 @@ export class MaterialShortCodesController {
       throw new NotFoundException();
     }
 
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(materialId);
-    const foundShortCode = materialShortCodes.find(msc => msc.shortCodeId === shortCode.id && msc.materialId === materialId)
+    const materialShortCodes =
+      await this.materialShortCodeService.ListByMaterialId(materialId);
+    const foundShortCode = materialShortCodes.find(
+      (msc) =>
+        msc.shortCodeId === shortCode.id && msc.materialId === materialId,
+    );
     if (!foundShortCode) {
       throw new ConflictException();
     }
@@ -94,10 +113,13 @@ export class MaterialShortCodesController {
   @OnEvent(EEvent.DELETE_MATERIAL)
   @OnEvent(EEvent.CHECKOUT_MATERIAL)
   public async DeleteByMaterial(payload: { id: string }) {
-    const materialShortCodes = await this.materialShortCodeService.ListByMaterialId(payload.id);
+    const materialShortCodes =
+      await this.materialShortCodeService.ListByMaterialId(payload.id);
 
     for (let materialShortCode of materialShortCodes) {
-      const shortCode = await this.shortCodeService.GetShortCode(materialShortCode.shortCodeId);
+      const shortCode = await this.shortCodeService.GetShortCode(
+        materialShortCode.shortCodeId,
+      );
 
       await this.DeleteMaterialShortCode(payload.id, shortCode.code);
     }

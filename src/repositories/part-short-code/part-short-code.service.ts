@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { PartShortCode } from "../../database/entities/part_short_code.entity.js";
-import * as crypto from "node:crypto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PartShortCode } from '../../database/entities/part_short_code.entity.js';
+import * as crypto from 'node:crypto';
 
 @Injectable()
 export class PartShortCodeService {
   constructor(
     @InjectRepository(PartShortCode)
     private readonly partShortCodeRepository: Repository<PartShortCode>,
-  ) {
-  }
+  ) {}
 
   public async Create(partId: string, shortCodeId: string) {
     const createdPartShortCode = this.partShortCodeRepository.create({
@@ -19,7 +18,8 @@ export class PartShortCodeService {
       shortCodeId,
     });
 
-    const savedPartShortCode = await this.partShortCodeRepository.save(createdPartShortCode);
+    const savedPartShortCode =
+      await this.partShortCodeRepository.save(createdPartShortCode);
 
     return {
       id: savedPartShortCode.id,
@@ -32,7 +32,9 @@ export class PartShortCodeService {
     });
   }
 
-  public async ListByShortCodeId(shortCodeId: string): Promise<Array<PartShortCode>> {
+  public async ListByShortCodeId(
+    shortCodeId: string,
+  ): Promise<Array<PartShortCode>> {
     return await this.partShortCodeRepository.find({
       where: { shortCodeId },
     });

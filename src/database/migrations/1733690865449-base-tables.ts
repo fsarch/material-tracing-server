@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { getDataType } from './utils/data-type.mapper.js';
-import { ShortCodeType } from "../../constants/short-code-type.enum.js";
+import { ShortCodeType } from '../../constants/short-code-type.enum.js';
 
 export class BaseTables1720373216667 implements MigrationInterface {
   name = 'BaseTables1720373216667';
@@ -74,21 +74,26 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'UQ__short_code__code',
-          columnNames: ['code'],
-          isUnique: true,
-          where: 'deletion_time IS NULL'
-        }, {
-          name: 'IDX__short_code__short_code_type_id',
-          columnNames: ['short_code_type_id'],
-        }],
-        foreignKeys: [{
-          name: 'FK__short_code__short_code_type_id',
-          columnNames: ['short_code_type_id'],
-          referencedTableName: 'short_code_type',
-          referencedColumnNames: ['id'],
-        }],
+        indices: [
+          {
+            name: 'UQ__short_code__code',
+            columnNames: ['code'],
+            isUnique: true,
+            where: 'deletion_time IS NULL',
+          },
+          {
+            name: 'IDX__short_code__short_code_type_id',
+            columnNames: ['short_code_type_id'],
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'FK__short_code__short_code_type_id',
+            columnNames: ['short_code_type_id'],
+            referencedTableName: 'short_code_type',
+            referencedColumnNames: ['id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -128,10 +133,12 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__manufacturer__external_id',
-          columnNames: ['external_id'],
-        }],
+        indices: [
+          {
+            name: 'IDX__manufacturer__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -176,19 +183,24 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__material_type__external_id',
-          columnNames: ['external_id'],
-        }, {
-          name: 'IDX__material_type__manufacturer_id',
-          columnNames: ['manufacturer_id'],
-        }],
-        foreignKeys: [{
-          name: 'FK__material_type__manufacturer_id',
-          columnNames: ['manufacturer_id'],
-          referencedTableName: 'manufacturer',
-          referencedColumnNames: ['id'],
-        }],
+        indices: [
+          {
+            name: 'IDX__material_type__external_id',
+            columnNames: ['external_id'],
+          },
+          {
+            name: 'IDX__material_type__manufacturer_id',
+            columnNames: ['manufacturer_id'],
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'FK__material_type__manufacturer_id',
+            columnNames: ['manufacturer_id'],
+            referencedTableName: 'manufacturer',
+            referencedColumnNames: ['id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -239,19 +251,24 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__material__external_id',
-          columnNames: ['external_id'],
-        }, {
-          name: 'IDX__material__material_type_id',
-          columnNames: ['material_type_id'],
-        }],
-        foreignKeys: [{
-          name: 'FK__material__material_type_id',
-          columnNames: ['material_type_id'],
-          referencedTableName: 'material_type',
-          referencedColumnNames: ['id'],
-        }],
+        indices: [
+          {
+            name: 'IDX__material__external_id',
+            columnNames: ['external_id'],
+          },
+          {
+            name: 'IDX__material__material_type_id',
+            columnNames: ['material_type_id'],
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'FK__material__material_type_id',
+            columnNames: ['material_type_id'],
+            referencedTableName: 'material_type',
+            referencedColumnNames: ['id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -289,33 +306,40 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__material_short_code__short_code_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['short_code_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'short_code',
-        }, {
-          name: 'fk__material_short_code__material_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['material_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'material',
-        }],
-        indices: [{
-          name: 'IDX__material_short_code__short_code_id',
-          columnNames: ['short_code_id'],
-        }, {
-          name: 'IDX__material_short_code__material_id',
-          columnNames: ['material_id'],
-        }, {
-          name: 'UQ__material_short_code__short_code_id__material_id',
-          columnNames: ['short_code_id', 'material_id'],
-          isUnique: true,
-          where: 'deletion_time IS NULL',
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__material_short_code__short_code_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['short_code_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'short_code',
+          },
+          {
+            name: 'fk__material_short_code__material_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['material_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'material',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__material_short_code__short_code_id',
+            columnNames: ['short_code_id'],
+          },
+          {
+            name: 'IDX__material_short_code__material_id',
+            columnNames: ['material_id'],
+          },
+          {
+            name: 'UQ__material_short_code__short_code_id__material_id',
+            columnNames: ['short_code_id', 'material_id'],
+            isUnique: true,
+            where: 'deletion_time IS NULL',
+          },
+        ],
       }),
     );
     // endregion
@@ -355,10 +379,12 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__part_type__external_id',
-          columnNames: ['external_id'],
-        }],
+        indices: [
+          {
+            name: 'IDX__part_type__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -403,21 +429,26 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__part__part_type_id',
-          columnNames: ['part_type_id'],
-        }, {
-          name: 'IDX__part__external_id',
-          columnNames: ['external_id'],
-        }],
-        foreignKeys: [{
-          name: 'fk__part__part_type_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['part_type_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'part_type',
-        }],
+        indices: [
+          {
+            name: 'IDX__part__part_type_id',
+            columnNames: ['part_type_id'],
+          },
+          {
+            name: 'IDX__part__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'fk__part__part_type_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['part_type_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'part_type',
+          },
+        ],
       }),
     );
     // endregion
@@ -455,33 +486,40 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__part_short_code__short_code_id',
-          columnNames: ['short_code_id'],
-        }, {
-          name: 'IDX__part_short_code__part_id',
-          columnNames: ['part_id'],
-        }, {
-          name: 'UQ__part_short_code__short_code_id__part_id',
-          columnNames: ['short_code_id', 'part_id'],
-          isUnique: true,
-          where: 'deletion_time IS NULL',
-        }],
-        foreignKeys: [{
-          name: 'fk__part_short_code__short_code_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['short_code_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'short_code',
-        }, {
-          name: 'fk__part_short_code__part_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['part_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'part',
-        }],
+        indices: [
+          {
+            name: 'IDX__part_short_code__short_code_id',
+            columnNames: ['short_code_id'],
+          },
+          {
+            name: 'IDX__part_short_code__part_id',
+            columnNames: ['part_id'],
+          },
+          {
+            name: 'UQ__part_short_code__short_code_id__part_id',
+            columnNames: ['short_code_id', 'part_id'],
+            isUnique: true,
+            where: 'deletion_time IS NULL',
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'fk__part_short_code__short_code_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['short_code_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'short_code',
+          },
+          {
+            name: 'fk__part_short_code__part_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['part_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'part',
+          },
+        ],
       }),
     );
     // endregion
@@ -519,33 +557,40 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__part_material__part_id',
-          columnNames: ['part_id'],
-        }, {
-          name: 'IDX__part_material__material_id',
-          columnNames: ['material_id'],
-        }, {
-          name: 'UQ__part_material__material_id__part_id',
-          columnNames: ['material_id', 'part_id'],
-          isUnique: true,
-          where: 'deletion_time IS NULL',
-        }],
-        foreignKeys: [{
-          name: 'fk__part_material__part_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['part_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'part',
-        }, {
-          name: 'fk__part_material__material_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['material_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'material',
-        }],
+        indices: [
+          {
+            name: 'IDX__part_material__part_id',
+            columnNames: ['part_id'],
+          },
+          {
+            name: 'IDX__part_material__material_id',
+            columnNames: ['material_id'],
+          },
+          {
+            name: 'UQ__part_material__material_id__part_id',
+            columnNames: ['material_id', 'part_id'],
+            isUnique: true,
+            where: 'deletion_time IS NULL',
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'fk__part_material__part_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['part_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'part',
+          },
+          {
+            name: 'fk__part_material__material_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['material_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'material',
+          },
+        ],
       }),
     );
     // endregion
@@ -588,33 +633,40 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__part_children__part_id',
-          columnNames: ['part_id'],
-        }, {
-          name: 'IDX__part_children__child_part_id',
-          columnNames: ['child_part_id'],
-        }, {
-          name: 'UQ__part_children__part_id__child_part_id',
-          columnNames: ['part_id', 'child_part_id'],
-          isUnique: true,
-          where: 'deletion_time IS NULL',
-        }],
-        foreignKeys: [{
-          name: 'fk__part_children__part_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['part_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'part',
-        }, {
-          name: 'fk__part_children__child_part_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['child_part_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'part',
-        }],
+        indices: [
+          {
+            name: 'IDX__part_children__part_id',
+            columnNames: ['part_id'],
+          },
+          {
+            name: 'IDX__part_children__child_part_id',
+            columnNames: ['child_part_id'],
+          },
+          {
+            name: 'UQ__part_children__part_id__child_part_id',
+            columnNames: ['part_id', 'child_part_id'],
+            isUnique: true,
+            where: 'deletion_time IS NULL',
+          },
+        ],
+        foreignKeys: [
+          {
+            name: 'fk__part_children__part_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['part_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'part',
+          },
+          {
+            name: 'fk__part_children__child_part_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['child_part_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'part',
+          },
+        ],
       }),
     );
     // endregion

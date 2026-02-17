@@ -1,7 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, Patch, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { ManufacturerService } from "../../repositories/manufacturer/manufacturer.service.js";
-import { ManufacturerCreateDto, ManufacturerDto, ManufacturerUpdateDto } from "../../models/manufacturer.model.js";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Patch,
+  Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ManufacturerService } from '../../repositories/manufacturer/manufacturer.service.js';
+import {
+  ManufacturerCreateDto,
+  ManufacturerDto,
+  ManufacturerUpdateDto,
+} from '../../models/manufacturer.model.js';
 
 @ApiTags('manufacturers')
 @Controller({
@@ -10,13 +23,12 @@ import { ManufacturerCreateDto, ManufacturerDto, ManufacturerUpdateDto } from ".
 })
 @ApiBearerAuth()
 export class ManufacturersController {
-  constructor(
-    private readonly manufacturerService: ManufacturerService,
-  ) {}
+  constructor(private readonly manufacturerService: ManufacturerService) {}
 
   @Post()
   public async Create(@Body() manufacturerCreateDto: ManufacturerCreateDto) {
-    const createdManufacturer = await this.manufacturerService.CreateManufacturer(manufacturerCreateDto)
+    const createdManufacturer =
+      await this.manufacturerService.CreateManufacturer(manufacturerCreateDto);
 
     return {
       id: createdManufacturer.id,
@@ -30,8 +42,11 @@ export class ManufacturersController {
     required: false,
     description: 'Search by name (case-insensitive) or externalId',
   })
-  public async List(@Query('search') search?: string): Promise<Array<ManufacturerDto>> {
-    const manufacturers = await this.manufacturerService.ListManufacturers(search);
+  public async List(
+    @Query('search') search?: string,
+  ): Promise<Array<ManufacturerDto>> {
+    const manufacturers =
+      await this.manufacturerService.ListManufacturers(search);
 
     return manufacturers.map(ManufacturerDto.FromDbo);
   }
@@ -40,7 +55,8 @@ export class ManufacturersController {
   public async Get(
     @Param('manufacturerId') manufacturerId: string,
   ): Promise<ManufacturerDto> {
-    const manufacturer = await this.manufacturerService.GetManufacturerById(manufacturerId);
+    const manufacturer =
+      await this.manufacturerService.GetManufacturerById(manufacturerId);
 
     return ManufacturerDto.FromDbo(manufacturer);
   }
@@ -57,6 +73,9 @@ export class ManufacturersController {
     @Param('manufacturerId') manufacturerId: string,
     @Body() updateDto: ManufacturerUpdateDto,
   ): Promise<void> {
-    await this.manufacturerService.UpdateManufacturer(manufacturerId, updateDto);
+    await this.manufacturerService.UpdateManufacturer(
+      manufacturerId,
+      updateDto,
+    );
   }
 }

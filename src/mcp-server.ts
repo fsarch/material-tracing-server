@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { McpService } from './mcp/mcp.service.js';
-import { PinoLogger } from "./utils/logger/pino-logger.service.js";
+import { PinoLogger } from './utils/logger/pino-logger.service.js';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule, {

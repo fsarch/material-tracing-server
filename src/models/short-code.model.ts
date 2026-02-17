@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { ShortCode } from "../database/entities/short_code.entity.js";
-import { IsOptional } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { ShortCode } from '../database/entities/short_code.entity.js';
+import { IsOptional } from 'class-validator';
 
 export class ShortCodeCreateDto {
   @ApiProperty()

@@ -1,9 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Post, Patch, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { MaterialTypeCreateDto, MaterialTypeDto, MaterialTypeUpdateDto } from "../../models/material-type.model.js";
-import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
-import { OnEvent } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Patch,
+  Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  MaterialTypeCreateDto,
+  MaterialTypeDto,
+  MaterialTypeUpdateDto,
+} from '../../models/material-type.model.js';
+import { MaterialTypeService } from '../../repositories/material-type/material-type.service.js';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
 
 @ApiTags('material-type')
 @Controller({
@@ -12,13 +25,13 @@ import { EEvent } from "../../constants/event.enum.js";
 })
 @ApiBearerAuth()
 export class MaterialTypesController {
-  constructor(
-    private readonly materialTypeService: MaterialTypeService,
-  ) {}
+  constructor(private readonly materialTypeService: MaterialTypeService) {}
 
   @Post()
   public async Create(@Body() materialTypeCreateDto: MaterialTypeCreateDto) {
-    return await this.materialTypeService.CreateMaterialType(materialTypeCreateDto);
+    return await this.materialTypeService.CreateMaterialType(
+      materialTypeCreateDto,
+    );
   }
 
   @Get()
@@ -38,7 +51,10 @@ export class MaterialTypesController {
     @Query('isArchived') isArchived?: boolean,
     @Query('search') search?: string,
   ): Promise<Array<MaterialTypeDto>> {
-    const materialTypes = await this.materialTypeService.ListMaterialTypes(isArchived ?? false, search);
+    const materialTypes = await this.materialTypeService.ListMaterialTypes(
+      isArchived ?? false,
+      search,
+    );
 
     return materialTypes.map(MaterialTypeDto.FromDbo);
   }
@@ -47,7 +63,8 @@ export class MaterialTypesController {
   public async Get(
     @Param('materialTypeId') materialTypeId: string,
   ): Promise<MaterialTypeDto> {
-    const materialType = await this.materialTypeService.GetMaterialType(materialTypeId);
+    const materialType =
+      await this.materialTypeService.GetMaterialType(materialTypeId);
 
     return MaterialTypeDto.FromDbo(materialType);
   }
@@ -64,15 +81,26 @@ export class MaterialTypesController {
     @Param('materialTypeId') materialTypeId: string,
     @Body() updateDto: MaterialTypeUpdateDto,
   ): Promise<void> {
-    await this.materialTypeService.UpdateMaterialType(materialTypeId, updateDto);
+    await this.materialTypeService.UpdateMaterialType(
+      materialTypeId,
+      updateDto,
+    );
   }
 
   @OnEvent(EEvent.DELETE_MANUFACTURER)
-  public async DeleteByManufacturer(payload: { id: string, deletionTime: string }) {
-    const materialTypes = await this.materialTypeService.ListByManufacturer(payload.id);
+  public async DeleteByManufacturer(payload: {
+    id: string;
+    deletionTime: string;
+  }) {
+    const materialTypes = await this.materialTypeService.ListByManufacturer(
+      payload.id,
+    );
 
     for (let materialType of materialTypes) {
-      await this.materialTypeService.DeleteById(materialType.id, payload.deletionTime);
+      await this.materialTypeService.DeleteById(
+        materialType.id,
+        payload.deletionTime,
+      );
     }
   }
 }

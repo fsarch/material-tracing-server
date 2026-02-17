@@ -1,10 +1,24 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Patch, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { MaterialService } from "../../repositories/material/material.service.js";
-import { MaterialCreateDto, MaterialDto, MaterialUpdateDto } from "../../models/material.model.js";
-import { MaterialTypeService } from "../../repositories/material-type/material-type.service.js";
-import { OnEvent } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Patch,
+  Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { MaterialService } from '../../repositories/material/material.service.js';
+import {
+  MaterialCreateDto,
+  MaterialDto,
+  MaterialUpdateDto,
+} from '../../models/material.model.js';
+import { MaterialTypeService } from '../../repositories/material-type/material-type.service.js';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
 
 @ApiTags('material')
 @Controller({
@@ -29,13 +43,17 @@ export class MaterialsController {
     name: 'search',
     type: String,
     required: false,
-    description: 'Search by name (case-insensitive), externalId, or materialTypeId',
+    description:
+      'Search by name (case-insensitive), externalId, or materialTypeId',
   })
   public async List(
     @Query('isArchived') isArchived?: boolean,
     @Query('search') search?: string,
   ) {
-    const materials = await this.materialService.ListMaterials(isArchived ?? false, search);
+    const materials = await this.materialService.ListMaterials(
+      isArchived ?? false,
+      search,
+    );
 
     return materials.map(MaterialDto.FromDbo);
   }
@@ -59,8 +77,9 @@ export class MaterialsController {
 
     return await this.materialService.CreateMaterial({
       ...materialCreateDto,
-      name: materialCreateDto.name
-        || `${materialType.name} (${new Intl.DateTimeFormat('de', { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Berlin", }).format(new Date())})`,
+      name:
+        materialCreateDto.name ||
+        `${materialType.name} (${new Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Berlin' }).format(new Date())})`,
     });
   }
 
@@ -75,12 +94,18 @@ export class MaterialsController {
   }
 
   @Patch('/:materialId')
-  public async Update(@Param('materialId') materialId: string, @Body() updateDto: MaterialUpdateDto) {
+  public async Update(
+    @Param('materialId') materialId: string,
+    @Body() updateDto: MaterialUpdateDto,
+  ) {
     await this.materialService.UpdateMaterial(materialId, updateDto);
   }
 
   @OnEvent(EEvent.DELETE_MATERIAL_TYPE)
-  public async DeleteByManufacturer(payload: { id: string, deletionTime: string }) {
+  public async DeleteByManufacturer(payload: {
+    id: string;
+    deletionTime: string;
+  }) {
     const materials = await this.materialService.ListByMaterialType(payload.id);
 
     for (let material of materials) {

@@ -1,16 +1,24 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Material } from "../../database/entities/material.entity.js";
-import { IsNull, Repository } from "typeorm";
-import { MaterialCreateDto, MaterialUpdateDto } from "../../models/material.model.js";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { EEvent } from "../../constants/event.enum.js";
-import { escapeSqlWildcards } from "../../utils/sql-search.utils.js";
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Material } from '../../database/entities/material.entity.js';
+import { IsNull, Repository } from 'typeorm';
+import {
+  MaterialCreateDto,
+  MaterialUpdateDto,
+} from '../../models/material.model.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EEvent } from '../../constants/event.enum.js';
+import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
 
 @Injectable()
 export class MaterialService {
   constructor(
-    @InjectRepository(Material) private readonly materialRepository: Repository<Material>,
+    @InjectRepository(Material)
+    private readonly materialRepository: Repository<Material>,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -32,7 +40,10 @@ export class MaterialService {
     };
   }
 
-  public async ListMaterials(isArchived: boolean = false, search?: string): Promise<Array<Material>> {
+  public async ListMaterials(
+    isArchived: boolean = false,
+    search?: string,
+  ): Promise<Array<Material>> {
     const query = this.materialRepository.createQueryBuilder('material');
 
     // Apply archive filter
@@ -47,18 +58,19 @@ export class MaterialService {
       const escapedSearch = escapeSqlWildcards(search);
 
       // Check if search string is a valid UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const isUuid = uuidRegex.test(search);
 
       if (isUuid) {
         query.andWhere(
           '(material.name ILIKE :search OR material.external_id = :exactSearch OR material.material_type_id = :exactSearch)',
-          { search: `%${escapedSearch}%`, exactSearch: search }
+          { search: `%${escapedSearch}%`, exactSearch: search },
         );
       } else {
         query.andWhere(
           '(material.name ILIKE :search OR material.external_id = :exactSearch)',
-          { search: `%${escapedSearch}%`, exactSearch: search }
+          { search: `%${escapedSearch}%`, exactSearch: search },
         );
       }
     }
@@ -66,7 +78,9 @@ export class MaterialService {
     return query.getMany();
   }
 
-  public async ListByMaterialType(materialTypeId: string): Promise<Array<Material>> {
+  public async ListByMaterialType(
+    materialTypeId: string,
+  ): Promise<Array<Material>> {
     return this.materialRepository.find({
       where: {
         materialTypeId,
@@ -83,7 +97,7 @@ export class MaterialService {
   public async CheckoutMaterial(id: string): Promise<void> {
     const material = await this.GetById(id);
     if (!material) {
-      throw new NotFoundException("Not Found");
+      throw new NotFoundException('Not Found');
     }
 
     const checkoutTime = new Date();
@@ -97,13 +111,19 @@ export class MaterialService {
     });
   }
 
-  public async DeleteById(id: string, deletionTime = new Date().toISOString()): Promise<void> {
-    await this.materialRepository.update({
-      id,
-      deletionTime: IsNull(),
-    }, {
-      deletionTime,
-    });
+  public async DeleteById(
+    id: string,
+    deletionTime = new Date().toISOString(),
+  ): Promise<void> {
+    await this.materialRepository.update(
+      {
+        id,
+        deletionTime: IsNull(),
+      },
+      {
+        deletionTime,
+      },
+    );
 
     this.eventEmitter.emit(EEvent.DELETE_MATERIAL, {
       id,
@@ -111,7 +131,10 @@ export class MaterialService {
     });
   }
 
-  public async UpdateMaterial(id: string, updateDto: MaterialUpdateDto): Promise<void> {
+  public async UpdateMaterial(
+    id: string,
+    updateDto: MaterialUpdateDto,
+  ): Promise<void> {
     const material = await this.GetById(id);
     if (!material) {
       throw new NotFoundException('Material not found');
@@ -119,7 +142,9 @@ export class MaterialService {
 
     // Check if material is checked out
     if (material.checkoutTime) {
-      throw new BadRequestException('Cannot update material that is checked out');
+      throw new BadRequestException(
+        'Cannot update material that is checked out',
+      );
     }
 
     // Update only provided fields
