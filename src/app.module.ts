@@ -4,6 +4,7 @@ import { AppService } from './app.service.js';
 import { FsarchModule } from './fsarch/fsarch.module.js';
 import { ControllersModule } from './controllers/controllers.module.js';
 import { RepositoriesModule } from './repositories/repositories.module.js';
+import { McpModule } from './mcp/mcp.module.js';
 import { BaseTables1720373216667 } from "./database/migrations/1733690865449-base-tables.js";
 import { MaterialType } from "./database/entities/material_type.entity.js";
 import { Material } from "./database/entities/material.entity.js";
@@ -52,6 +53,7 @@ import { AddArchiveTime1766219951021 } from "./database/migrations/1766219951021
     EventEmitterModule.forRoot(),
     ControllersModule,
     RepositoriesModule,
+    McpModule,
   ],
   controllers: [AppController],
   providers: [AppService],
