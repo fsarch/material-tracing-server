@@ -162,6 +162,99 @@ Once configured with Claude Desktop, you can ask questions like:
 - "Find manufacturer by ID [uuid]"
 - "Search for short code 'ABC123'"
 
+## Architecture
+
+The MCP module follows NestJS best practices with a modular, decorator-based architecture:
+
+### Structure
+
+```
+src/mcp/
+├── decorators/
+│   └── mcp-tool.decorator.ts    # @McpTool and @McpToolProvider decorators
+├── core/
+│   ├── base-tool-provider.ts    # Base class for tool providers
+│   └── tool-registry.service.ts # Service that discovers and registers tools
+├── modules/
+│   ├── manufacturer-mcp.module.ts
+│   ├── material-mcp.module.ts
+│   ├── material-type-mcp.module.ts
+│   ├── part-mcp.module.ts
+│   ├── part-type-mcp.module.ts
+│   └── short-code-mcp.module.ts # Sub-modules for each resource type
+├── tools/
+│   ├── manufacturer-tool.provider.ts
+│   ├── material-tool.provider.ts
+│   ├── material-type-tool.provider.ts
+│   ├── part-tool.provider.ts
+│   ├── part-type-tool.provider.ts
+│   └── short-code-tool.provider.ts # Tool providers with decorated methods
+├── mcp.module.ts                 # Main MCP module
+├── mcp.service.ts                # MCP server implementation
+└── ../mcp-server.ts              # Entry point for running the MCP server
+```
+
+### Key Components
+
+**1. Decorators** (`decorators/mcp-tool.decorator.ts`)
+- `@McpToolProvider()`: Marks a class as an MCP tool provider
+- `@McpTool(metadata)`: Marks a method as an MCP tool with metadata
+
+**2. Base Tool Provider** (`core/base-tool-provider.ts`)
+- Provides helper methods for creating success/error responses
+- Base class for all tool providers
+
+**3. Tool Providers** (`tools/*.provider.ts`)
+- Each resource type has its own tool provider class
+- Methods are decorated with `@McpTool` to define MCP tools
+- Similar to NestJS controllers but for MCP instead of HTTP
+
+**4. Tool Registry** (`core/tool-registry.service.ts`)
+- Automatically discovers all tool providers using reflection
+- Registers all decorated methods as MCP tools
+- Provides access to tool metadata and handlers
+
+**5. Sub-Modules** (`modules/*-mcp.module.ts`)
+- Each resource type has its own module
+- Imports the corresponding repository module
+- Exports the tool provider for dependency injection
+
+### Example Tool Provider
+
+```typescript
+@Injectable()
+@McpToolProvider()
+export class ManufacturerToolProvider extends BaseToolProvider {
+  constructor(private readonly manufacturerService: ManufacturerService) {
+    super();
+  }
+
+  @McpTool({
+    name: 'search_manufacturers',
+    description: 'Search manufacturers by name or external ID',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        search: { type: 'string', description: 'Search term' },
+      },
+    },
+  })
+  async searchManufacturers(args: { search?: string }) {
+    const manufacturers = await this.manufacturerService.ListManufacturers(args.search);
+    return this.success(manufacturers);
+  }
+}
+```
+
+### Benefits of This Architecture
+
+1. **Modular**: Each resource type is in its own module, making it easy to add/remove functionality
+2. **Declarative**: Uses decorators like `@McpTool` to define tools, similar to `@Get`, `@Post` in controllers
+3. **Type-Safe**: Full TypeScript support with proper typing
+4. **Maintainable**: Clear separation of concerns between tool providers
+5. **Scalable**: Easy to add new resource types by creating new tool providers
+6. **NestJS-Idiomatic**: Follows NestJS patterns and conventions
+
 ## Integration
 
 The MCP module is integrated into the main application module and uses existing repository services to access the database. This ensures consistency with the REST API and allows the MCP server to leverage the same business logic.
