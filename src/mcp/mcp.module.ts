@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { McpService } from './mcp.service.js';
+import { McpController } from './mcp.controller.js';
 import { ToolRegistryService } from './core/tool-registry.service.js';
 import { ManufacturerMcpModule } from './modules/manufacturer-mcp.module.js';
 import { MaterialMcpModule } from './modules/material-mcp.module.js';
@@ -18,6 +19,7 @@ import { ShortCodeMcpModule } from './modules/short-code-mcp.module.js';
     ShortCodeMcpModule,
   ],
   providers: [McpService, ToolRegistryService],
+  controllers: [McpController],
   exports: [McpService],
 })
 export class McpModule {}

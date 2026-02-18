@@ -8,3 +8,5 @@ import { ManufacturerToolProvider } from '../tools/manufacturer-tool.provider.js
   exports: [ManufacturerToolProvider],
 })
 export class ManufacturerMcpModule {}
+
+

@@ -2,6 +2,219 @@
 
 This module provides an MCP (Model Context Protocol) server integrated into the Material Tracing NestJS application. The MCP server enables AI assistants and other tools to query the material tracing database.
 
+## Integration
+
+The MCP server is now integrated into the main NestJS HTTP server and accessible via REST endpoints under the `/.mcp` path. The server runs on the same port as the main application (default: 3000).
+
+## Configuration
+
+### Remote Server URL
+
+When configuring an MCP client to connect to this server, use the following URL format:
+
+```
+http://<hostname>:<port>/.mcp
+```
+
+**Examples:**
+
+- **Local Development**: `http://localhost:3000/.mcp`
+- **Docker/Network**: `http://material-tracing-server:3000/.mcp`
+- **Production**: `https://your-domain.com/.mcp` (requires reverse proxy with HTTPS)
+
+### MCP Client Configuration
+
+For use in Claude Desktop or other MCP clients, configure the server as:
+
+```json
+{
+  "mcpServers": {
+    "material-tracing": {
+      "url": "http://localhost:3000/.mcp",
+      "type": "http"
+    }
+  }
+}
+```
+
+## API Endpoints
+
+The MCP server implements the following HTTP endpoints:
+
+### 1. Initialize Server
+```
+POST /.mcp/initialize
+```
+
+Initializes the MCP server and returns server capabilities, protocol version, and server information. This endpoint **must** be called first when establishing a connection.
+
+**Response Example:**
+```json
+{
+  "protocolVersion": "2024-11-05",
+  "capabilities": {
+    "tools": {}
+  },
+  "serverInfo": {
+    "name": "material-tracing-server",
+    "version": "1.0.0"
+  }
+}
+```
+
+### 2. List Available Tools
+```
+GET /.mcp/tools
+```
+
+Returns a list of all available MCP tools with their descriptions and input schemas.
+
+**Response Example:**
+```json
+{
+  "tools": [
+    {
+      "name": "search_materials",
+      "description": "Search materials by name or external ID",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "search": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    }
+  ]
+}
+```
+
+### 3. List Available Resources (Optional)
+```
+GET /.mcp/resources
+```
+
+Returns information about all available API resources and endpoints.
+
+**Response Example:**
+```json
+{
+  "resources": [
+    {
+      "uri": "/.mcp/initialize",
+      "name": "Initialize Server",
+      "description": "Initialize the MCP server and get server capabilities",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "/.mcp/tools",
+      "name": "List Tools",
+      "description": "Get all available MCP tools",
+      "mimeType": "application/json"
+    }
+  ]
+}
+```
+
+### 4. Call a Tool
+```
+POST /.mcp/tools/call
+Content-Type: application/json
+
+{
+  "name": "tool_name",
+  "arguments": { /* tool arguments */ }
+}
+```
+
+Calls a specific tool with the provided arguments and returns the result.
+
+**Request Example:**
+```json
+{
+  "name": "search_materials",
+  "arguments": {
+    "search": "steel",
+    "status": "active"
+  }
+}
+```
+
+**Response Example:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[Tool result...]"
+    }
+  ]
+}
+```
+
+### 4. Health Check
+```
+GET /.mcp/health
+```
+
+Returns the health status of the MCP service.
+
+**Response Example:**
+```json
+{
+  "status": "ok",
+  "service": "mcp-server"
+}
+```
+
+## Quick Start Guide
+
+### 1. Start the Server
+
+```bash
+npm run start
+# or for development
+npm run start:dev
+```
+
+The MCP server will be available at `http://localhost:3000/.mcp`
+
+### 2. Test the Endpoints
+
+**Initialize the server:**
+```bash
+curl -X POST http://localhost:3000/.mcp/initialize
+```
+
+**List available tools:**
+```bash
+curl http://localhost:3000/.mcp/tools
+```
+
+**Check health:**
+```bash
+curl http://localhost:3000/.mcp/health
+```
+
+**Call a tool:**
+```bash
+curl -X POST http://localhost:3000/.mcp/tools/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "search_materials",
+    "arguments": {
+      "search": "steel"
+    }
+  }'
+```
+
+**Response Example:**
+```json
+{
+  "status": "ok",
+  "service": "mcp-server"
+}
+```
+
 ## Features
 
 The MCP server provides tools to query the following resource types:

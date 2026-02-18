@@ -1,28 +1,35 @@
+/**
+ * This file is kept for backwards compatibility.
+ * MCP Server is now integrated into the main Nest.JS server and available at:
+ * - GET  /.mcp/tools       - List all available tools
+ * - POST /.mcp/tools/call  - Call a specific tool
+ * - GET  /.mcp/health      - Health check
+ *
+ * The server runs directly on the main HTTP server port (default: 3000).
+ *
+ * You can use the main entry point (main.ts) to start the server.
+ * This file is deprecated and no longer needed.
+ */
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import { McpService } from './mcp/mcp.service.js';
 import { PinoLogger } from './utils/logger/pino-logger.service.js';
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule, {
+  // Start the full Nest.JS server with integrated MCP endpoints
+  const app = await NestFactory.create(AppModule, {
     logger: PinoLogger.Instance,
   });
 
-  const mcpService = app.get(McpService);
-  await mcpService.start();
+  app.enableCors();
 
-  // Handle graceful shutdown
-  process.on('SIGINT', async () => {
-    await mcpService.stop();
-    await app.close();
-    process.exit(0);
-  });
+  await app.listen(process.env.MCP_PORT ?? process.env.PORT ?? 3000);
 
-  process.on('SIGTERM', async () => {
-    await mcpService.stop();
-    await app.close();
-    process.exit(0);
-  });
+  console.log(
+    `MCP Server is running and available at /.mcp on port ${process.env.MCP_PORT ?? process.env.PORT ?? 3000}`,
+  );
 }
 
 bootstrap();
+
+
