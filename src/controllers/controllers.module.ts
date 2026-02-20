@@ -6,6 +6,7 @@ import { ShortCodesModule } from './short-codes/short-codes.module.js';
 import { MetaModule } from './meta/meta.module.js';
 import { PartTypesModule } from './part-types/part-types.module.js';
 import { PartsModule } from './parts/parts.module.js';
+import { WellKnownModule } from './well-known/well-known.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PartsModule } from './parts/parts.module.js';
     MetaModule,
     PartTypesModule,
     PartsModule,
+    WellKnownModule,
   ],
 })
 export class ControllersModule {}

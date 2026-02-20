@@ -1,21 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { Tool } from '@rekog/mcp-nest';
+import { z } from 'zod';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
-import { BaseToolProvider } from '../core/base-tool-provider.js';
-import { McpTool, McpToolProvider } from '../decorators/mcp-tool.decorator.js';
 
 type ResourceStatus = 'all' | 'active' | 'archived';
 
 @Injectable()
-@McpToolProvider()
-export class PartTypeToolProvider extends BaseToolProvider {
-  constructor(private readonly partTypeService: PartTypeService) {
-    super();
-  }
 
-  @McpTool({
+
+export class PartTypeToolProvider {
+  constructor(private readonly partTypeService: PartTypeService) {}
+
+  @Tool({
     name: 'search_part_types',
     description: 'Search part types by name or external ID',
-    inputSchema: {
+    schema: {
       type: 'object',
       properties: {
         search: {
@@ -42,7 +41,14 @@ export class PartTypeToolProvider extends BaseToolProvider {
 
       const allPartTypes = [...activePartTypes, ...archivedPartTypes];
 
-      return this.success(allPartTypes);
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(allPartTypes, null, 2),
+          },
+        ],
+      };
     }
 
     const partTypes = await this.partTypeService.ListPartTypes(
@@ -50,30 +56,45 @@ export class PartTypeToolProvider extends BaseToolProvider {
       args.search,
     );
 
-    return this.success(partTypes);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(partTypes, null, 2),
+        },
+      ],
+    };
   }
 
-  @McpTool({
+  @Tool({
     name: 'get_part_type',
     description: 'Get a single part type by ID',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'string',
-          description: 'Part type ID',
-        },
-      },
-      required: ['id'],
-    },
+    parameters: z.object({
+      id: z.string().describe('Part type ID'),
+    }),
   })
   async getPartType(args: { id: string }) {
     const partType = await this.partTypeService.GetPartType(args.id);
 
     if (!partType) {
-      return this.error('Part type not found');
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Part type not found',
+          },
+        ],
+        isError: true,
+      };
     }
 
-    return this.success(partType);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(partType, null, 2),
+        },
+      ],
+    };
   }
 }

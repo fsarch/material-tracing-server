@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { McpService } from './mcp.service.js';
-import { McpController } from './mcp.controller.js';
-import { ToolRegistryService } from './core/tool-registry.service.js';
+import { McpModule as RekovMcpModule } from '@rekog/mcp-nest';
 import { ManufacturerMcpModule } from './modules/manufacturer-mcp.module.js';
 import { MaterialMcpModule } from './modules/material-mcp.module.js';
 import { MaterialTypeMcpModule } from './modules/material-type-mcp.module.js';
@@ -11,6 +9,14 @@ import { ShortCodeMcpModule } from './modules/short-code-mcp.module.js';
 
 @Module({
   imports: [
+    RekovMcpModule.forRoot({
+      name: 'material-tracing-server',
+      version: '1.0.0',
+      capabilities: {
+        tools: {},
+      },
+      apiPrefix: '.mcp',
+    }),
     ManufacturerMcpModule,
     MaterialMcpModule,
     MaterialTypeMcpModule,
@@ -18,8 +24,5 @@ import { ShortCodeMcpModule } from './modules/short-code-mcp.module.js';
     PartTypeMcpModule,
     ShortCodeMcpModule,
   ],
-  providers: [McpService, ToolRegistryService],
-  controllers: [McpController],
-  exports: [McpService],
 })
 export class McpModule {}

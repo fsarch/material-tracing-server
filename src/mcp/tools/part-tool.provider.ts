@@ -1,21 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { Tool } from '@rekog/mcp-nest';
+import { z } from 'zod';
 import { PartService } from '../../repositories/part/part.service.js';
-import { BaseToolProvider } from '../core/base-tool-provider.js';
-import { McpTool, McpToolProvider } from '../decorators/mcp-tool.decorator.js';
 
 type ResourceStatus = 'all' | 'active' | 'archived' | 'checked-out';
 
 @Injectable()
-@McpToolProvider()
-export class PartToolProvider extends BaseToolProvider {
-  constructor(private readonly partService: PartService) {
-    super();
-  }
 
-  @McpTool({
+
+export class PartToolProvider {
+  constructor(private readonly partService: PartService) {}
+
+  @Tool({
     name: 'search_parts',
     description: 'Search parts by name or external ID',
-    inputSchema: {
+    schema: {
       type: 'object',
       properties: {
         search: {
@@ -42,7 +41,14 @@ export class PartToolProvider extends BaseToolProvider {
       });
       const checkedOutParts = allParts.filter((p) => p.checkoutTime !== null);
 
-      return this.success(checkedOutParts);
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(checkedOutParts, null, 2),
+          },
+        ],
+      };
     }
 
     if (status === 'all') {
@@ -54,7 +60,14 @@ export class PartToolProvider extends BaseToolProvider {
 
       const allParts = [...activeParts, ...archivedParts];
 
-      return this.success(allParts);
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(allParts, null, 2),
+          },
+        ],
+      };
     }
 
     const parts = await this.partService.ListParts({
@@ -62,30 +75,45 @@ export class PartToolProvider extends BaseToolProvider {
       search: args.search,
     });
 
-    return this.success(parts);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(parts, null, 2),
+        },
+      ],
+    };
   }
 
-  @McpTool({
+  @Tool({
     name: 'get_part',
     description: 'Get a single part by ID',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'string',
-          description: 'Part ID',
-        },
-      },
-      required: ['id'],
-    },
+    parameters: z.object({
+      id: z.string().describe('Part ID'),
+    }),
   })
   async getPart(args: { id: string }) {
     const part = await this.partService.GetById(args.id);
 
     if (!part) {
-      return this.error('Part not found');
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Part not found',
+          },
+        ],
+        isError: true,
+      };
     }
 
-    return this.success(part);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(part, null, 2),
+        },
+      ],
+    };
   }
 }

@@ -15,6 +15,7 @@ export type ConfigStaticAuthType = {
 export type ConfigJwtJwkAuthType = {
   type: 'jwt-jwk';
   jwkUrl: string;
+  discovery_url: string;
 };
 
 type ConfigAuthUserType = {

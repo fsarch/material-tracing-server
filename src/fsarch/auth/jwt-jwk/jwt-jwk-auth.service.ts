@@ -8,7 +8,6 @@ import { IAuthService } from '../types/auth-service.type.js';
 import { Request } from 'express';
 import { ModuleConfigurationService } from '../../configuration/module/module-configuration.service.js';
 import { ConfigJwtJwkAuthType } from '../../configuration/config.type.js';
-import { JwtService } from '@nestjs/jwt';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { User } from '../user.js';
 
@@ -38,7 +37,7 @@ export class JwtJwkAuthService implements IAuthService {
   public async validateRequest(request: any): Promise<User> {
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      console.debug('could not get token from header');
+      console.debug('could not get token from header at {url}', { url: request.url });
       throw new UnauthorizedException();
     }
 

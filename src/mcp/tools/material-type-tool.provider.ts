@@ -1,21 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { Tool } from '@rekog/mcp-nest';
+import { z } from 'zod';
 import { MaterialTypeService } from '../../repositories/material-type/material-type.service.js';
-import { BaseToolProvider } from '../core/base-tool-provider.js';
-import { McpTool, McpToolProvider } from '../decorators/mcp-tool.decorator.js';
 
 type ResourceStatus = 'all' | 'active' | 'archived';
 
 @Injectable()
-@McpToolProvider()
-export class MaterialTypeToolProvider extends BaseToolProvider {
-  constructor(private readonly materialTypeService: MaterialTypeService) {
-    super();
-  }
 
-  @McpTool({
+
+export class MaterialTypeToolProvider {
+  constructor(private readonly materialTypeService: MaterialTypeService) {}
+
+  @Tool({
     name: 'search_material_types',
     description: 'Search material types by name or external ID',
-    inputSchema: {
+    schema: {
       type: 'object',
       properties: {
         search: {
@@ -48,7 +47,14 @@ export class MaterialTypeToolProvider extends BaseToolProvider {
         ...archivedMaterialTypes,
       ];
 
-      return this.success(allMaterialTypes);
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(allMaterialTypes, null, 2),
+          },
+        ],
+      };
     }
 
     const materialTypes = await this.materialTypeService.ListMaterialTypes(
@@ -56,22 +62,22 @@ export class MaterialTypeToolProvider extends BaseToolProvider {
       args.search,
     );
 
-    return this.success(materialTypes);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(materialTypes, null, 2),
+        },
+      ],
+    };
   }
 
-  @McpTool({
+  @Tool({
     name: 'get_material_type',
     description: 'Get a single material type by ID',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'string',
-          description: 'Material type ID',
-        },
-      },
-      required: ['id'],
-    },
+    parameters: z.object({
+      id: z.string().describe('Material type ID'),
+    }),
   })
   async getMaterialType(args: { id: string }) {
     const materialType = await this.materialTypeService.GetMaterialType(
@@ -79,9 +85,24 @@ export class MaterialTypeToolProvider extends BaseToolProvider {
     );
 
     if (!materialType) {
-      return this.error('Material type not found');
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Material type not found',
+          },
+        ],
+        isError: true,
+      };
     }
 
-    return this.success(materialType);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(materialType, null, 2),
+        },
+      ],
+    };
   }
 }
