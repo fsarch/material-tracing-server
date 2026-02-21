@@ -53,11 +53,19 @@ export class PinoLogger extends ConsoleLogger {
     const context = this.section ?? args.pop();
     const data = args.shift();
 
+    const logData: Record<string, unknown> = {
+      payload: data,
+      section: context,
+      args,
+    };
+
+    if (message instanceof Error) {
+      logData.error = serializeError(message);
+      message = message.message;
+    }
+
     this.pino.error(
-      {
-        payload: data,
-        section: context,
-      },
+      logData,
       message,
     );
   }

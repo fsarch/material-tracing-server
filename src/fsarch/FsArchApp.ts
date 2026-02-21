@@ -4,6 +4,8 @@ import { PinoLogger } from "./logger/pino-logger.service.js";
 import { DynamicModule, ForwardReference, INestApplication, Module, Type, VersioningType } from "@nestjs/common";
 import { DatabaseModuleOptions } from "./database/database.module.js";
 import { FsarchModule } from "./fsarch.module.js";
+import { AuthExceptionFilter } from "./auth/errors/AuthExceptionFilter.js";
+import { AuthService } from "./auth/auth.service.js";
 
 type SwaggerOptionsType = {
   path?: string;
@@ -56,6 +58,11 @@ export class FsArchAppBuilder {
       logger: PinoLogger.Instance,
     });
     app.enableCors();
+
+    if (this.authOptions) {
+      const authService = app.get(AuthService);
+      app.useGlobalFilters(new AuthExceptionFilter(authService));
+    }
 
     app.enableVersioning({
       type: VersioningType.URI,

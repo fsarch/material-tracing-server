@@ -27,4 +27,12 @@ export class AuthService implements IAuthService {
   signIn(username: string, password: string): Promise<{ accessToken: string }> {
     return this.authService.signIn(username, password);
   }
+
+  get getWwwAuthenticateValue() {
+    return this.authService.getWwwAuthenticateValue;
+  }
+
+  get getOauthMetadata() {
+    return this.authService.getOauthMetadata;
+  }
 }

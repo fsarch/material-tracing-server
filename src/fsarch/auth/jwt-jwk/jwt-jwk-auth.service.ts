@@ -58,4 +58,8 @@ export class JwtJwkAuthService implements IAuthService {
       accessToken: token,
     });
   }
+
+  public async getWwwAuthenticateValue() {
+    return `Bearer resource_metadata="/.well-known/oauth-protected-resource"`;
+  }
 }
