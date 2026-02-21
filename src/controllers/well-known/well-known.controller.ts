@@ -1,14 +1,20 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Req } from "@nestjs/common";
 import { Public } from "../../fsarch/auth/decorators/public.decorator.js";
+import type { Request } from "express";
 
 @Controller('.well-known')
 export class WellKnownController {
   @Public()
   @Get('oauth-protected-resource')
-  getOAuthProtectedResource() {
+  getOAuthProtectedResource(@Req() req: Request) {
+    const proto = this.getRequestProtocol(req);
+    const host = this.getRequestHost(req);
+    const resource = `${proto}://${host}`;
+
     return {
-      resource: 'http://localhost:8080',
-      authorization_servers: ['https://login-dev.vb3d.de/realms/VB3D-Dev/protocol/openid-connect/auth'],
+      resource,
+      // authorization_servers: ['https://login-dev.vb3d.de/realms/VB3D-Dev/protocol/openid-connect/auth'],
+      authorization_servers: ['https://login-dev.vb3d.de'],
       jwks_uri:
         'https://login-dev.vb3d.de/realms/VB3D-Dev/protocol/openid-connect/certs',
       bearer_methods_supported: ['header', 'body', 'query'],
@@ -17,5 +23,39 @@ export class WellKnownController {
       resource_policy_uri: 'http://localhost:3030/policy',
       resource_tos_uri: 'http://localhost:3030/tos',
     };
+  }
+
+  private getRequestProtocol(req: Request): string {
+    const forwardedProtoHeader = req.headers['x-forwarded-proto'] as string | undefined;
+    if (forwardedProtoHeader && forwardedProtoHeader.length > 0) {
+      // falls mehrere Werte gesetzt sind, ersten verwenden
+      const first = forwardedProtoHeader.split(',')[0].trim();
+      if (first.length > 0) return first;
+    }
+
+    if (req.protocol && typeof req.protocol === 'string' && req.protocol.length > 0) {
+      return req.protocol;
+    }
+
+    if (typeof req.secure === 'boolean' && req.secure) {
+      return 'https';
+    }
+
+    return 'http';
+  }
+
+  private getRequestHost(req: Request): string {
+    const forwardedHostHeader = req.headers['x-forwarded-host'] as string | undefined;
+    if (forwardedHostHeader && forwardedHostHeader.length > 0) {
+      const first = forwardedHostHeader.split(',')[0].trim();
+      if (first.length > 0) return first;
+    }
+
+    const hostHeader = req.headers['host'] as string | undefined;
+    if (hostHeader && hostHeader.length > 0) {
+      return hostHeader;
+    }
+
+    return 'localhost:8080';
   }
 }
