@@ -13,7 +13,7 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    const authenticateData = await this.authServer.getWwwAuthenticateValue();
+    const authenticateData = await this.authServer.getWwwAuthenticateValue?.();
     if (authenticateData) {
       response.setHeader(
         'WWW-Authenticate',
