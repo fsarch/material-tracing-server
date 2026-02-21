@@ -6,10 +6,8 @@ import { ShortCodesModule } from './short-codes/short-codes.module.js';
 import { MetaModule } from './meta/meta.module.js';
 import { PartTypesModule } from './part-types/part-types.module.js';
 import { PartsModule } from './parts/parts.module.js';
-import { WellKnownController } from "./well-known/well-known.controller.js";
 
 @Module({
-  controllers: [WellKnownController],
   imports: [
     MaterialsModule,
     MaterialTypesModule,

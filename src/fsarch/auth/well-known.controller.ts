@@ -1,7 +1,7 @@
-import { Controller, Get, Req } from "@nestjs/common";
-import { Public } from "../../fsarch/auth/decorators/public.decorator.js";
+import { Controller, Get, NotFoundException, Req } from "@nestjs/common";
+import { Public } from "./decorators/public.decorator.js";
 import type { Request } from "express";
-import { AuthService } from "../../fsarch/auth/auth.service.js";
+import { AuthService } from "./auth.service.js";
 
 @Controller('.well-known')
 export class WellKnownController {
@@ -12,11 +12,14 @@ export class WellKnownController {
   @Public()
   @Get('oauth-protected-resource')
   async getOAuthProtectedResource(@Req() req: Request) {
+    const metadata = await this.authService.getOidcMetadata?.();
+    if (!metadata) {
+      throw new NotFoundException();
+    }
+
     const proto = this.getRequestProtocol(req);
     const host = this.getRequestHost(req);
     const resource = `${proto}://${host}`;
-
-    const metadata = await this.authService.getOidcMetadata?.() as { authorization_endpoint?: string; jwks_uri?: string } | null | undefined;
 
     const jwksUri = metadata?.jwks_uri;
     const authorizationServers = metadata?.authorization_endpoint
@@ -38,7 +41,6 @@ export class WellKnownController {
   private getRequestProtocol(req: Request): string {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'] as string | undefined;
     if (forwardedProtoHeader && forwardedProtoHeader.length > 0) {
-      // falls mehrere Werte gesetzt sind, ersten verwenden
       const first = forwardedProtoHeader.split(',')[0].trim();
       if (first.length > 0) return first;
     }
@@ -69,3 +71,4 @@ export class WellKnownController {
     return 'localhost:8080';
   }
 }
+

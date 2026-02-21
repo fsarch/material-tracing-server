@@ -10,8 +10,10 @@ import { JwtJwkAuthModule } from './jwt-jwk/jwt-jwk-auth.module.js';
 import { JWT_JWK_AUTH_CONFIG_VALIDATOR } from './jwt-jwk/jwt-jwk-auth-config.validator.js';
 import { OidcAuthModule } from "./oidc/oidc-auth.module.js";
 import { OIDC_AUTH_CONFIG_VALIDATOR } from "./oidc/oidc-auth-config.validator.js";
+import { WellKnownController } from "./well-known.controller.js";
 
 @Module({
+  controllers: [WellKnownController],
   providers: [
     {
       provide: APP_GUARD,
