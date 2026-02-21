@@ -1,27 +1,20 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
-import { VersioningType } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PinoLogger } from './utils/logger/pino-logger.service.js';
+import { FsArchAppBuilder } from "./fsarch/FsArchApp.js";
+import { AppModule } from "./app.module.js";
+import { DATABASE_OPTIONS } from "./database/index.js";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: PinoLogger.Instance,
-  });
-  app.enableCors();
-
-  app.enableVersioning({
-    type: VersioningType.URI,
-  });
-
-  const config = new DocumentBuilder()
-    .setTitle('Material-Tracing-Server')
-    .setDescription('The Material-Tracing-Server API description')
-    .addBearerAuth()
-    .setVersion('1.0')
+  const app = await new FsArchAppBuilder(AppModule, {
+    name: 'Material-Tracing-Server',
+    version: '1.0.0',
+  })
+    .addSwagger({
+      title: 'Material-Tracing-Server',
+      description: 'The Material-Tracing-Server API description',
+      version: '1.0',
+    })
+    .enableAuth()
+    .setDatabase(DATABASE_OPTIONS)
     .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }

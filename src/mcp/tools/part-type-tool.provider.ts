@@ -6,28 +6,22 @@ import { PartTypeService } from '../../repositories/part-type/part-type.service.
 type ResourceStatus = 'all' | 'active' | 'archived';
 
 @Injectable()
-
-
 export class PartTypeToolProvider {
   constructor(private readonly partTypeService: PartTypeService) {}
 
   @Tool({
     name: 'search_part_types',
     description: 'Search part types by name or external ID',
-    schema: {
-      type: 'object',
-      properties: {
-        search: {
-          type: 'string',
-          description: 'Search term for part type name or external ID',
-        },
-        status: {
-          type: 'string',
-          description: 'Filter by status: all, active, or archived',
-          enum: ['all', 'active', 'archived'],
-        },
-      },
-    },
+    parameters: z.object({
+      search: z
+        .string()
+        .optional()
+        .describe('Search term for part type name or external ID'),
+      status: z
+        .enum(['all', 'active', 'archived'])
+        .optional()
+        .describe('Filter by status: all, active, or archived'),
+    }),
   })
   async searchPartTypes(args: { search?: string; status?: ResourceStatus }) {
     const status = args.status || 'active';

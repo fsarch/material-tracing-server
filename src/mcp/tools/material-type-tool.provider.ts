@@ -6,28 +6,22 @@ import { MaterialTypeService } from '../../repositories/material-type/material-t
 type ResourceStatus = 'all' | 'active' | 'archived';
 
 @Injectable()
-
-
 export class MaterialTypeToolProvider {
   constructor(private readonly materialTypeService: MaterialTypeService) {}
 
   @Tool({
     name: 'search_material_types',
     description: 'Search material types by name or external ID',
-    schema: {
-      type: 'object',
-      properties: {
-        search: {
-          type: 'string',
-          description: 'Search term for material type name or external ID',
-        },
-        status: {
-          type: 'string',
-          description: 'Filter by status: all, active, or archived',
-          enum: ['all', 'active', 'archived'],
-        },
-      },
-    },
+    parameters: z.object({
+      search: z
+        .string()
+        .optional()
+        .describe('Search term for material type name or external ID'),
+      status: z
+        .enum(['all', 'active', 'archived'])
+        .optional()
+        .describe('Filter by status: all, active, or archived'),
+    }),
   })
   async searchMaterialTypes(args: {
     search?: string;

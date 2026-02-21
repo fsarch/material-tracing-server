@@ -1,4 +1,5 @@
 import {
+  HttpException, HttpStatus,
   Inject,
   Injectable,
   NotImplementedException,
@@ -10,6 +11,7 @@ import { ModuleConfigurationService } from '../../configuration/module/module-co
 import { ConfigJwtJwkAuthType } from '../../configuration/config.type.js';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { User } from '../user.js';
+import { AuthUnauthorizedException } from "../errors/AuthUnauthorizedException.js";
 
 @Injectable()
 export class JwtJwkAuthService implements IAuthService {
@@ -37,8 +39,7 @@ export class JwtJwkAuthService implements IAuthService {
   public async validateRequest(request: any): Promise<User> {
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      console.debug('could not get token from header at {url}', { url: request.url });
-      throw new UnauthorizedException();
+      throw new AuthUnauthorizedException();
     }
 
     try {
@@ -50,7 +51,7 @@ export class JwtJwkAuthService implements IAuthService {
     } catch (error) {
       console.debug('could not verify jwt', error);
 
-      throw new UnauthorizedException(error);
+      throw new AuthUnauthorizedException(error);
     }
 
     return new User({
