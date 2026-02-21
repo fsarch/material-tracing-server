@@ -14,7 +14,7 @@ import { AuthUnauthorizedException } from "../errors/AuthUnauthorizedException.j
 
 @Injectable()
 export class OidcAuthService implements IAuthService {
-  private oidcConfiguration: { authorization_endpoint: string; jwks_uri: string; } | null = null;
+  private oidcConfiguration: { authorization_endpoint: string; jwks_uri: string; scopes_supported: Array<string> } | null = null;
   private jwkSet: ReturnType<typeof createRemoteJWKSet> | null;
 
   constructor(
@@ -86,7 +86,7 @@ export class OidcAuthService implements IAuthService {
     return `Bearer resource_metadata="/.well-known/oauth-protected-resource"`;
   }
 
-  public async getOidcMetadata(): Promise<{ authorization_endpoint: string; jwks_uri: string } | null> {
+  public async getOidcMetadata() {
     try {
       return await this.getOidcConfiguration();
     } catch (err) {

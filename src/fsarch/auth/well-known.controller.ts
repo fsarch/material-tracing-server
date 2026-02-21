@@ -30,11 +30,8 @@ export class WellKnownController {
       resource,
       authorization_servers: authorizationServers,
       jwks_uri: jwksUri,
-      bearer_methods_supported: ['header', 'body', 'query'],
-      scopes_supported: ['profile', 'offline_access'],
-      resource_documentation: 'http://localhost:3030/docs',
-      resource_policy_uri: 'http://localhost:3030/policy',
-      resource_tos_uri: 'http://localhost:3030/tos',
+      bearer_methods_supported: ['header'],
+      scopes_supported: metadata.scopes_supported,
     };
   }
 
