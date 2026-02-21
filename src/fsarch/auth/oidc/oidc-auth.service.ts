@@ -3,7 +3,6 @@ import {
   Inject,
   Injectable,
   NotImplementedException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { IAuthService } from '../types/auth-service.type.js';
 import { Request } from 'express';
@@ -85,5 +84,14 @@ export class OidcAuthService implements IAuthService {
 
   public async getWwwAuthenticateValue() {
     return `Bearer resource_metadata="/.well-known/oauth-protected-resource"`;
+  }
+
+  public async getOidcMetadata(): Promise<{ authorization_endpoint: string; jwks_uri: string } | null> {
+    try {
+      return await this.getOidcConfiguration();
+    } catch (err) {
+      console.debug('Failed to get OIDC metadata', err);
+      return null;
+    }
   }
 }

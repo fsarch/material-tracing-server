@@ -38,10 +38,10 @@ export class AuthService implements IAuthService {
   }
 
   get getWwwAuthenticateValue() {
-    return this.authService.getWwwAuthenticateValue;
+    return this.authService.getWwwAuthenticateValue?.bind(this.authService);
   }
 
-  get getOauthMetadata() {
-    return this.authService.getOauthMetadata;
+  get getOidcMetadata() {
+    return this.authService.getOidcMetadata?.bind(this.authService);
   }
 }

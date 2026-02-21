@@ -1,22 +1,32 @@
 import { Controller, Get, Req } from "@nestjs/common";
 import { Public } from "../../fsarch/auth/decorators/public.decorator.js";
 import type { Request } from "express";
+import { AuthService } from "../../fsarch/auth/auth.service.js";
 
 @Controller('.well-known')
 export class WellKnownController {
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
+
   @Public()
   @Get('oauth-protected-resource')
-  getOAuthProtectedResource(@Req() req: Request) {
+  async getOAuthProtectedResource(@Req() req: Request) {
     const proto = this.getRequestProtocol(req);
     const host = this.getRequestHost(req);
     const resource = `${proto}://${host}`;
 
+    const metadata = await this.authService.getOidcMetadata?.() as { authorization_endpoint?: string; jwks_uri?: string } | null | undefined;
+
+    const jwksUri = metadata?.jwks_uri;
+    const authorizationServers = metadata?.authorization_endpoint
+      ? [new URL(metadata.authorization_endpoint).origin]
+      : undefined;
+
     return {
       resource,
-      // authorization_servers: ['https://login-dev.vb3d.de/realms/VB3D-Dev/protocol/openid-connect/auth'],
-      authorization_servers: ['https://login-dev.vb3d.de'],
-      jwks_uri:
-        'https://login-dev.vb3d.de/realms/VB3D-Dev/protocol/openid-connect/certs',
+      authorization_servers: authorizationServers,
+      jwks_uri: jwksUri,
       bearer_methods_supported: ['header', 'body', 'query'],
       scopes_supported: ['profile', 'offline_access'],
       resource_documentation: 'http://localhost:3030/docs',
