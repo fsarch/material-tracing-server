@@ -64,12 +64,19 @@ export class PartsController {
     required: false,
     description: 'Filter by archived status (default: false)',
   })
+  @ApiQuery({
+    name: 'partTypeId',
+    type: String,
+    required: false,
+    description: 'Filter parts by partTypeId (UUID). If provided, only parts with this partTypeId are returned.',
+  })
   public async List(
     @Query('skip') skip?: number,
     @Query('take') take?: number,
     @Query('name') name?: string,
     @Query('search') search?: string,
     @Query('isArchived') isArchived?: boolean,
+    @Query('partTypeId') partTypeId?: string,
   ) {
     // Set default take value to 25 if not provided
     const takeValue = take ?? 25;
@@ -80,6 +87,7 @@ export class PartsController {
       name,
       search,
       isArchived: isArchived ?? false,
+      partTypeId,
     });
 
     return parts.map(PartDto.FromDbo);

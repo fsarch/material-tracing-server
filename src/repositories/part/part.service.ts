@@ -77,6 +77,7 @@ export class PartService {
     name?: string;
     isArchived?: boolean;
     search?: string;
+    partTypeId?: string;
   }): Promise<Array<Part>> {
     const query = this.partRepository.createQueryBuilder('part');
 
@@ -113,6 +114,13 @@ export class PartService {
       const escapedName = escapeSqlWildcards(options.name);
 
       query.andWhere('part.name ILIKE :name', { name: `%${escapedName}%` });
+    }
+
+    // Apply explicit partTypeId filter if provided
+    if (options.partTypeId !== undefined && options.partTypeId !== '') {
+      query.andWhere('part.part_type_id = :partTypeId', {
+        partTypeId: options.partTypeId,
+      });
     }
 
     if (options.skip !== undefined) {
