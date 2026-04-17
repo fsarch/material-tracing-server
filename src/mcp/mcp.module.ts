@@ -15,7 +15,7 @@ import { ShortCodeMcpModule } from './modules/short-code-mcp.module.js';
       capabilities: {
         tools: {},
       },
-      apiPrefix: '.mcp',
+      apiPrefix: '.ai',
     }),
     ManufacturerMcpModule,
     MaterialMcpModule,

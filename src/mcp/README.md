@@ -4,7 +4,7 @@ This module provides an MCP (Model Context Protocol) server integrated into the 
 
 ## Integration
 
-The MCP server is now integrated into the main NestJS HTTP server and accessible via REST endpoints under the `/.mcp` path. The server runs on the same port as the main application (default: 3000).
+The MCP server is now integrated into the main NestJS HTTP server and accessible via REST endpoints under the `/.ai` path. The server runs on the same port as the main application (default: 3000).
 
 ## Configuration
 
@@ -13,14 +13,14 @@ The MCP server is now integrated into the main NestJS HTTP server and accessible
 When configuring an MCP client to connect to this server, use the following URL format:
 
 ```
-http://<hostname>:<port>/.mcp
+http://<hostname>:<port>/.ai
 ```
 
 **Examples:**
 
-- **Local Development**: `http://localhost:3000/.mcp`
-- **Docker/Network**: `http://material-tracing-server:3000/.mcp`
-- **Production**: `https://your-domain.com/.mcp` (requires reverse proxy with HTTPS)
+- **Local Development**: `http://localhost:3000/.ai`
+- **Docker/Network**: `http://material-tracing-server:3000/.ai`
+- **Production**: `https://your-domain.com/.ai` (requires reverse proxy with HTTPS)
 
 ### MCP Client Configuration
 
@@ -30,7 +30,7 @@ For use in Claude Desktop or other MCP clients, configure the server as:
 {
   "mcpServers": {
     "material-tracing": {
-      "url": "http://localhost:3000/.mcp",
+      "url": "http://localhost:3000/.ai",
       "type": "http"
     }
   }
@@ -43,7 +43,7 @@ The MCP server implements the following HTTP endpoints:
 
 ### 1. Initialize Server
 ```
-POST /.mcp/initialize
+POST /.ai/initialize
 ```
 
 Initializes the MCP server and returns server capabilities, protocol version, and server information. This endpoint **must** be called first when establishing a connection.
@@ -64,7 +64,7 @@ Initializes the MCP server and returns server capabilities, protocol version, an
 
 ### 2. List Available Tools
 ```
-GET /.mcp/tools
+GET /.ai/tools
 ```
 
 Returns a list of all available MCP tools with their descriptions and input schemas.
@@ -90,7 +90,7 @@ Returns a list of all available MCP tools with their descriptions and input sche
 
 ### 3. List Available Resources (Optional)
 ```
-GET /.mcp/resources
+GET /.ai/resources
 ```
 
 Returns information about all available API resources and endpoints.
