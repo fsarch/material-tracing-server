@@ -8,12 +8,13 @@ import {
   Patch,
   Body,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { ShortCodeService } from '../../repositories/short-code/short-code.service.js';
 import {
   ShortCodeDto,
   ShortCodeUpdateDto,
 } from '../../models/short-code.model.js';
+import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { ShortCodeType } from '../../constants/short-code-type.enum.js';
 
 @ApiTags('short-code')
@@ -31,6 +32,21 @@ export class ShortCodesController {
   }
 
   @Get()
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginationResultDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(ShortCodeDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiQuery({
     name: 'shortCodeTypeId',
     required: false,
@@ -44,15 +60,34 @@ export class ShortCodesController {
     description: 'Search by code (case-insensitive)',
   })
   public async ListShortCodes(
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
     @Query('shortCodeTypeId') shortCodeTypeId?: ShortCodeType,
     @Query('search') search?: string,
-  ) {
-    const shortCodes = await this.shortCodeService.ListShortCodes({
+  ): Promise<PaginationResultDto<ShortCodeDto>> {
+    const takeValue = take ?? 25;
+
+    const all = await this.shortCodeService.ListShortCodes({
       shortCodeTypeId,
       search,
     });
 
-    return shortCodes.map(ShortCodeDto.FromDbo);
+    const totalItems = all.length;
+    const start = skip ?? 0;
+
+    const data = all.slice(start, start + takeValue).map(ShortCodeDto.FromDbo);
+
+    const metadata = {
+      currentPage: Math.floor(start / takeValue) + 1,
+      pageSize: takeValue,
+      totalItems,
+      totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
+    };
+
+    return {
+      data,
+      metadata,
+    };
   }
 
   @Get(':code')

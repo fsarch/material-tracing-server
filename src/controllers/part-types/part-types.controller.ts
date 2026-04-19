@@ -9,13 +9,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import {
   PartTypeCreateDto,
   PartTypeDto,
   PartTypePatchDto,
 } from '../../models/part-type.model.js';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
+import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 
 @ApiTags('part-types')
 @Controller({
@@ -32,6 +33,21 @@ export class PartTypesController {
   }
 
   @Get()
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginationResultDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(PartTypeDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiQuery({
     name: 'isArchived',
     type: Boolean,
@@ -45,15 +61,34 @@ export class PartTypesController {
     description: 'Search by name (case-insensitive) or externalId',
   })
   public async List(
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
     @Query('isArchived') isArchived?: boolean,
     @Query('search') search?: string,
-  ): Promise<Array<PartTypeDto>> {
-    const partTypes = await this.partTypeService.ListPartTypes(
+  ): Promise<PaginationResultDto<PartTypeDto>> {
+    const takeValue = take ?? 25;
+
+    const all = await this.partTypeService.ListPartTypes(
       isArchived ?? false,
       search,
     );
 
-    return partTypes.map(PartTypeDto.FromDbo);
+    const totalItems = all.length;
+    const start = skip ?? 0;
+
+    const data = all.slice(start, start + takeValue).map(PartTypeDto.FromDbo);
+
+    const metadata = {
+      currentPage: Math.floor(start / takeValue) + 1,
+      pageSize: takeValue,
+      totalItems,
+      totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
+    };
+
+    return {
+      data,
+      metadata,
+    };
   }
 
   @Get('/:partTypeId')

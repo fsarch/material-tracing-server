@@ -9,8 +9,9 @@ import {
   Patch,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { MaterialService } from '../../repositories/material/material.service.js';
+import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import {
   MaterialCreateDto,
   MaterialDto,
@@ -33,6 +34,21 @@ export class MaterialsController {
   ) {}
 
   @Get()
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginationResultDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(MaterialDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiQuery({
     name: 'isArchived',
     type: Boolean,
@@ -47,15 +63,35 @@ export class MaterialsController {
       'Search by name (case-insensitive), externalId, or materialTypeId',
   })
   public async List(
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
     @Query('isArchived') isArchived?: boolean,
     @Query('search') search?: string,
-  ) {
-    const materials = await this.materialService.ListMaterials(
+  ): Promise<PaginationResultDto<MaterialDto>> {
+    const takeValue = take ?? 25;
+
+    // fetch all matching materials to compute total
+    const allMaterials = await this.materialService.ListMaterials(
       isArchived ?? false,
       search,
     );
 
-    return materials.map(MaterialDto.FromDbo);
+    const totalItems = allMaterials.length;
+
+    const start = skip ?? 0;
+    const dataSlice = allMaterials.slice(start, start + takeValue).map(MaterialDto.FromDbo);
+
+    const metadata = {
+      currentPage: Math.floor(start / takeValue) + 1,
+      pageSize: takeValue,
+      totalItems,
+      totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
+    };
+
+    return {
+      data: dataSlice,
+      metadata,
+    };
   }
 
   @Get('/:materialId')

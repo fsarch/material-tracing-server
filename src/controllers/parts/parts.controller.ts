@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 import { PartService } from '../../repositories/part/part.service.js';
 import {
@@ -17,6 +17,7 @@ import {
   PartDto,
   PartPatchDto,
 } from '../../models/part.model.js';
+import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
 
@@ -70,6 +71,21 @@ export class PartsController {
     required: false,
     description: 'Filter parts by partTypeId (UUID). If provided, only parts with this partTypeId are returned.',
   })
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginationResultDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(PartDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   public async List(
     @Query('skip') skip?: number,
     @Query('take') take?: number,
@@ -77,10 +93,21 @@ export class PartsController {
     @Query('search') search?: string,
     @Query('isArchived') isArchived?: boolean,
     @Query('partTypeId') partTypeId?: string,
-  ) {
+  ): Promise<PaginationResultDto<PartDto>> {
     // Set default take value to 25 if not provided
     const takeValue = take ?? 25;
 
+    // Get total matching parts (without pagination)
+    const allParts = await this.partService.ListParts({
+      isArchived: isArchived ?? false,
+      name,
+      search,
+      partTypeId,
+    });
+
+    const totalItems = allParts.length;
+
+    // Get paged parts
     const parts = await this.partService.ListParts({
       skip,
       take: takeValue,
@@ -90,7 +117,20 @@ export class PartsController {
       partTypeId,
     });
 
-    return parts.map(PartDto.FromDbo);
+    const data = parts.map(PartDto.FromDbo);
+
+    const start = skip ?? 0;
+    const metadata = {
+      currentPage: Math.floor(start / takeValue) + 1,
+      pageSize: takeValue,
+      totalItems,
+      totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
+    };
+
+    return {
+      data,
+      metadata,
+    };
   }
 
   @Get('/:partId')
