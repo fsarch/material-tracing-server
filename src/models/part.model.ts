@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Part } from '../database/entities/part.entity.js';
 import { IsOptional } from 'class-validator';
+import { ShortCodeDto } from './short-code.model.js';
 
 export class PartCreateDto {
   @ApiProperty()
@@ -64,6 +65,8 @@ export class PartDto {
     partDto.hint = part.hint;
     partDto.archiveTime = part.archiveTime;
 
+    // shortCodes are not set here by default; controller may attach them when requested
+
     return partDto;
   }
 
@@ -98,4 +101,7 @@ export class PartDto {
 
   @ApiProperty({ required: false })
   archiveTime?: Date;
+
+  @ApiProperty({ required: false, type: () => [ShortCodeDto] })
+  shortCodes?: Array<ShortCodeDto>;
 }

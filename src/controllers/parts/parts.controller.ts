@@ -9,9 +9,11 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 import { PartService } from '../../repositories/part/part.service.js';
+import { PartShortCodeService } from '../../repositories/part-short-code/part-short-code.service.js';
+import { ShortCodeService } from '../../repositories/short-code/short-code.service.js';
 import {
   PartCreateDto,
   PartDto,
@@ -31,6 +33,8 @@ export class PartsController {
   constructor(
     private readonly partTypeService: PartTypeService,
     private readonly partService: PartService,
+    private readonly partShortCodeService: PartShortCodeService,
+    private readonly shortCodeService: ShortCodeService,
   ) {}
 
   @Get()
@@ -71,6 +75,13 @@ export class PartsController {
     required: false,
     description: 'Filter parts by partTypeId (UUID). If provided, only parts with this partTypeId are returned.',
   })
+  @ApiQuery({
+    name: 'embed',
+    isArray: true,
+    type: String,
+    required: false,
+    description: "Embed related resources. Supported values: 'availableAmount', 'shortCodes'",
+  })
   @ApiOkResponse({
     schema: {
       allOf: [
@@ -93,6 +104,7 @@ export class PartsController {
     @Query('search') search?: string,
     @Query('isArchived') isArchived?: boolean,
     @Query('partTypeId') partTypeId?: string,
+    @Query('embed') embed: Array<string> = [],
   ): Promise<PaginationResultDto<PartDto>> {
     // Set default take value to 25 if not provided
     const takeValue = take ?? 25;
@@ -127,6 +139,37 @@ export class PartsController {
       totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
     };
 
+    // If client requested embedding of shortCodes, fetch and attach them
+    if (embed.includes('shortCodes')) {
+      // For performance, do operations in parallel per part
+      await Promise.all(
+        data.map(async (dto) => {
+          const partShortCodes = await this.partShortCodeService.ListByPartId(
+            dto.id,
+          );
+
+          if (!partShortCodes || partShortCodes.length === 0) {
+            dto.shortCodes = [];
+            return;
+          }
+
+          const shortCodePromises = partShortCodes.map((psc) =>
+            this.shortCodeService.GetShortCode(psc.shortCodeId),
+          );
+
+          const shortCodes = (await Promise.all(shortCodePromises)).filter(
+            (s) => s !== null,
+          );
+
+          // Convert to DTOs using ShortCodeDto
+          dto.shortCodes = shortCodes.map((s) =>
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            require('../../models/short-code.model.js').ShortCodeDto.FromDbo(s),
+          );
+        }),
+      );
+    }
+
     return {
       data,
       metadata,
@@ -135,14 +178,14 @@ export class PartsController {
 
   @Get('/:partId')
   @ApiQuery({
-    name: 'include',
+    name: 'embed',
     isArray: true,
     type: String,
     required: false,
   })
   public async Get(
     @Param('partId') partId: string,
-    @Query('include') include: Array<string> = [],
+    @Query('embed') embed: Array<string> = [],
   ) {
     const part = await this.partService.GetById(partId);
     if (!part) {
@@ -151,9 +194,8 @@ export class PartsController {
 
     const dto = PartDto.FromDbo(part);
 
-    if (include.includes('availableAmount')) {
-      const availableAmount = await this.partService.GetAvailableAmount(partId);
-      dto.availableAmount = availableAmount;
+    if (embed.includes('availableAmount')) {
+      dto.availableAmount = await this.partService.GetAvailableAmount(partId);
     }
 
     return dto;
