@@ -19,6 +19,7 @@ import {
   PartDto,
   PartPatchDto,
 } from '../../models/part.model.js';
+import { ShortCodeDto } from '../../models/short-code.model.js';
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
@@ -139,35 +140,44 @@ export class PartsController {
       totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
     };
 
-    // If client requested embedding of shortCodes, fetch and attach them
+    // If client requested embedding of shortCodes, fetch and attach them in bulk to avoid N+1 queries
     if (embed.includes('shortCodes')) {
-      // For performance, do operations in parallel per part
-      await Promise.all(
-        data.map(async (dto) => {
-          const partShortCodes = await this.partShortCodeService.ListByPartId(
-            dto.id,
-          );
+      const partIds = data.map((d) => d.id);
 
-          if (!partShortCodes || partShortCodes.length === 0) {
-            dto.shortCodes = [];
-            return;
-          }
-
-          const shortCodePromises = partShortCodes.map((psc) =>
-            this.shortCodeService.GetShortCode(psc.shortCodeId),
-          );
-
-          const shortCodes = (await Promise.all(shortCodePromises)).filter(
-            (s) => s !== null,
-          );
-
-          // Convert to DTOs using ShortCodeDto
-          dto.shortCodes = shortCodes.map((s) =>
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            require('../../models/short-code.model.js').ShortCodeDto.FromDbo(s),
-          );
-        }),
+      // load all part_short_code rows for the returned parts in one query
+      const partShortCodes = await this.partShortCodeService.ListByPartIds(
+        partIds,
       );
+
+      if (!partShortCodes || partShortCodes.length === 0) {
+        data.forEach((d) => (d.shortCodes = []));
+      } else {
+        // determine unique shortCodeIds and load all shortCodes in one query
+        const shortCodeIds = Array.from(
+          new Set(partShortCodes.map((psc) => psc.shortCodeId)),
+        );
+
+        const shortCodes = await this.shortCodeService.ListByIds(shortCodeIds);
+
+        const shortCodeById = new Map(shortCodes.map((s) => [s.id, s]));
+
+        // group shortCodeIds by partId
+        const mapPartIdToShortCodeIds = new Map<string, Array<string>>();
+        for (const psc of partShortCodes) {
+          const arr = mapPartIdToShortCodeIds.get(psc.partId) || [];
+          arr.push(psc.shortCodeId);
+          mapPartIdToShortCodeIds.set(psc.partId, arr);
+        }
+
+        // attach DTOs
+        data.forEach((dto) => {
+          const ids = mapPartIdToShortCodeIds.get(dto.id) || [];
+          dto.shortCodes = ids
+            .map((id) => shortCodeById.get(id))
+            .filter((s) => s)
+            .map((s) => ShortCodeDto.FromDbo(s));
+        });
+      }
     }
 
     return {

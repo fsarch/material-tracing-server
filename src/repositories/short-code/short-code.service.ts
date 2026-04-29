@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { ShortCode } from '../../database/entities/short_code.entity.js';
 import { MaterialShortCode } from '../../database/entities/material_short_code.entity.js';
 import { PartShortCode } from '../../database/entities/part_short_code.entity.js';
@@ -170,5 +170,15 @@ export class ShortCodeService {
     }
 
     return null;
+  }
+
+  /**
+   * Bulk load short codes by their ids
+   */
+  public async ListByIds(ids: Array<string>): Promise<Array<ShortCode>> {
+    if (!ids || ids.length === 0) return [];
+    return this.shortCodeRepository.find({
+      where: { id: In(ids) },
+    });
   }
 }

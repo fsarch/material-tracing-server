@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { PartShortCode } from '../../database/entities/part_short_code.entity.js';
 import * as crypto from 'node:crypto';
 
@@ -29,6 +29,16 @@ export class PartShortCodeService {
   public async ListByPartId(partId: string): Promise<Array<PartShortCode>> {
     return await this.partShortCodeRepository.find({
       where: { partId },
+    });
+  }
+
+  /**
+   * Bulk list PartShortCode entries for multiple partIds
+   */
+  public async ListByPartIds(partIds: Array<string>): Promise<Array<PartShortCode>> {
+    if (!partIds || partIds.length === 0) return [];
+    return await this.partShortCodeRepository.find({
+      where: { partId: In(partIds) },
     });
   }
 
