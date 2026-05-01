@@ -140,9 +140,18 @@ export class PartsController {
       totalPages: Math.max(1, Math.ceil(totalItems / takeValue)),
     };
 
+    const partIds = parts.map((p) => p.id);
+
+    // If client requested embedding of availableAmount, one grouped DB query for all parts
+    if (embed.includes('availableAmount')) {
+      const availableAmounts = await this.partService.GetAvailableAmountsBulk(partIds);
+      data.forEach((dto) => {
+        dto.availableAmount = availableAmounts.get(dto.id) ?? dto.amount;
+      });
+    }
+
     // If client requested embedding of shortCodes, fetch and attach them in bulk to avoid N+1 queries
     if (embed.includes('shortCodes')) {
-      const partIds = data.map((d) => d.id);
 
       // load all part_short_code rows for the returned parts in one query
       const partShortCodes = await this.partShortCodeService.ListByPartIds(

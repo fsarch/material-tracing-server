@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Part } from '../../database/entities/part.entity.js';
-import { IsNull, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartCreateDto, PartPatchDto } from '../../models/part.model.js';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -154,9 +154,44 @@ export class PartService {
       childPartId: id,
     });
 
-    console.log('totalAmount', totalAmount, childrenPartAmount);
-
     return totalAmount - childrenPartAmount;
+  }
+
+  /**
+   * Bulk variant of GetAvailableAmount based on part IDs.
+   * Returns a Map<partId, availableAmount>.
+   */
+  public async GetAvailableAmountsBulk(
+    partIds: Array<string>,
+  ): Promise<Map<string, number>> {
+    if (!partIds || partIds.length === 0) return new Map();
+
+    const ids = Array.from(new Set(partIds));
+
+    const parts = await this.partRepository.find({
+      where: { id: In(ids) },
+      select: { id: true, amount: true },
+    });
+
+    if (parts.length === 0) return new Map();
+
+    const rows: Array<{ child_part_id: string; used: string }> =
+      await this.partChildrenRepository
+        .createQueryBuilder('pc')
+        .select('pc.child_part_id', 'child_part_id')
+        .addSelect('SUM(pc.amount)', 'used')
+        .where('pc.child_part_id IN (:...ids)', { ids })
+        .andWhere('pc.deletion_time IS NULL')
+        .groupBy('pc.child_part_id')
+        .getRawMany();
+
+    const usedByPartId = new Map(
+      rows.map((r) => [r.child_part_id, parseInt(r.used, 10)]),
+    );
+
+    return new Map(
+      parts.map((p) => [p.id, p.amount - (usedByPartId.get(p.id) ?? 0)]),
+    );
   }
 
   public async GetById(id: string): Promise<Part | null> {
