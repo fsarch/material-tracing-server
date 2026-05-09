@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -23,6 +24,9 @@ import { ShortCodeDto } from '../../models/short-code.model.js';
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
+import { MaterialService } from '../../repositories/material/material.service.js';
+import { PartMaterialService } from '../../repositories/part-material/part-material.service.js';
+import { PartPartService } from '../../repositories/part-part/part-part.service.js';
 
 @ApiTags('parts')
 @Controller({
@@ -36,6 +40,9 @@ export class PartsController {
     private readonly partService: PartService,
     private readonly partShortCodeService: PartShortCodeService,
     private readonly shortCodeService: ShortCodeService,
+    private readonly materialService: MaterialService,
+    private readonly partMaterialService: PartMaterialService,
+    private readonly partPartService: PartPartService,
   ) {}
 
   @Get()
@@ -222,6 +229,13 @@ export class PartsController {
 
   @Post()
   public async Create(@Body() partCreateDto: PartCreateDto) {
+    const materials = partCreateDto.materials ?? [];
+    const childParts = partCreateDto.parts ?? [];
+
+    if (childParts.some((childPart) => childPart.amount <= 0)) {
+      throw new BadRequestException('Part amount must be greater than 0');
+    }
+
     const partType = await this.partTypeService.GetPartType(
       partCreateDto.partTypeId,
     );
@@ -230,12 +244,49 @@ export class PartsController {
       throw new NotFoundException();
     }
 
-    return await this.partService.CreatePart({
+    // Validate all material IDs exist
+    await Promise.all(
+      materials.map(async ({ id }) => {
+        const material = await this.materialService.GetById(id);
+        if (!material) {
+          throw new NotFoundException(`Material with id ${id} not found`);
+        }
+      }),
+    );
+
+    // Validate all child part IDs exist
+    await Promise.all(
+      childParts.map(async ({ id }) => {
+        const childPart = await this.partService.GetById(id);
+        if (!childPart) {
+          throw new NotFoundException(`Part with id ${id} not found`);
+        }
+      }),
+    );
+
+    // Create the part
+    const createdPart = await this.partService.CreatePart({
       ...partCreateDto,
       name:
         partCreateDto.name ||
         `${partType.name} (${new Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Berlin' }).format(new Date())})`,
     });
+
+    // Link materials in parallel
+    await Promise.all(
+      materials.map(({ id }) =>
+        this.partMaterialService.CreateOrGet(createdPart.id, id),
+      ),
+    );
+
+    // Link child parts in parallel
+    await Promise.all(
+      childParts.map(({ id, amount }) =>
+        this.partPartService.GetOrAdd(createdPart.id, id, amount),
+      ),
+    );
+
+    return createdPart;
   }
 
   @Patch('/:partId')

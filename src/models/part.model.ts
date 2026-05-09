@@ -3,6 +3,19 @@ import { Part } from '../database/entities/part.entity.js';
 import { IsOptional } from 'class-validator';
 import { ShortCodeDto } from './short-code.model.js';
 
+class PartCreateMaterialRefDto {
+  @ApiProperty()
+  id: string;
+}
+
+class PartCreateChildPartRefDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  amount: number;
+}
+
 export class PartCreateDto {
   @ApiProperty()
   name: string;
@@ -23,6 +36,14 @@ export class PartCreateDto {
   @ApiProperty({ required: false })
   @IsOptional()
   archiveTime?: Date;
+
+  @ApiProperty({ required: false, type: () => [PartCreateMaterialRefDto] })
+  @IsOptional()
+  materials?: Array<PartCreateMaterialRefDto>;
+
+  @ApiProperty({ required: false, type: () => [PartCreateChildPartRefDto] })
+  @IsOptional()
+  parts?: Array<PartCreateChildPartRefDto>;
 }
 
 export class PartPatchDto {

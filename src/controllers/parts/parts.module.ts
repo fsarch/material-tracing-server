@@ -8,6 +8,9 @@ import { PartsModule as PartPartsModule } from './parts/parts.module.js';
 import { ActionsModule } from './actions/actions.module.js';
 import { PartShortCodeModule } from "../../repositories/part-short-code/part-short-code.module.js";
 import { ShortCodeModule } from "../../repositories/short-code/short-code.module.js";
+import { MaterialModule } from '../../repositories/material/material.module.js';
+import { PartMaterialModule } from '../../repositories/part-material/part-material.module.js';
+import { PartPartModule } from '../../repositories/part-part/part-part.module.js';
 
 @Module({
   controllers: [PartsController],
@@ -21,6 +24,9 @@ import { ShortCodeModule } from "../../repositories/short-code/short-code.module
     PartShortCodeModule,
     ActionsModule,
     ShortCodeModule,
+    MaterialModule,
+    PartMaterialModule,
+    PartPartModule,
   ],
 })
 export class PartsModule {}
