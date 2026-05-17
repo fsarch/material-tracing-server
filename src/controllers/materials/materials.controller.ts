@@ -9,7 +9,7 @@ import {
   Patch,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MaterialService } from '../../repositories/material/material.service.js';
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import {
@@ -20,6 +20,7 @@ import {
 import { MaterialTypeService } from '../../repositories/material-type/material-type.service.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
+import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('material')
 @Controller({
@@ -34,21 +35,7 @@ export class MaterialsController {
   ) {}
 
   @Get()
-  @ApiOkResponse({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginationResultDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(MaterialDto) },
-            },
-          },
-        },
-      ],
-    },
-  })
+  @ApiOkPaginatedResponse(MaterialDto)
   @ApiQuery({
     name: 'isArchived',
     type: Boolean,

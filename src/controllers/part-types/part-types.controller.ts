@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   PartTypeCreateDto,
   PartTypeDto,
@@ -17,6 +17,7 @@ import {
 } from '../../models/part-type.model.js';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
+import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('part-types')
 @Controller({
@@ -33,21 +34,7 @@ export class PartTypesController {
   }
 
   @Get()
-  @ApiOkResponse({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginationResultDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(PartTypeDto) },
-            },
-          },
-        },
-      ],
-    },
-  })
+  @ApiOkPaginatedResponse(PartTypeDto)
   @ApiQuery({
     name: 'isArchived',
     type: Boolean,

@@ -8,7 +8,7 @@ import {
   Patch,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ManufacturerService } from '../../repositories/manufacturer/manufacturer.service.js';
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import {
@@ -16,6 +16,7 @@ import {
   ManufacturerDto,
   ManufacturerUpdateDto,
 } from '../../models/manufacturer.model.js';
+import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('manufacturers')
 @Controller({
@@ -37,21 +38,7 @@ export class ManufacturersController {
   }
 
   @Get()
-  @ApiOkResponse({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginationResultDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(ManufacturerDto) },
-            },
-          },
-        },
-      ],
-    },
-  })
+  @ApiOkPaginatedResponse(ManufacturerDto)
   @ApiQuery({
     name: 'search',
     type: String,

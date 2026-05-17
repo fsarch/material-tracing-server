@@ -20,6 +20,7 @@ export class FsArchAppBuilder {
   private swaggerOptions: Array<SwaggerOptionsType> = [];
   private databaseOptions?: DatabaseModuleOptions;
   private authOptions?: {};
+  private readonly httpMethods = new Set(['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']);
 
   constructor(private readonly baseModule: IEntryModule, private readonly info: { name: string; version: string }) {
 
@@ -38,6 +39,35 @@ export class FsArchAppBuilder {
   enableAuth() {
     this.authOptions = {};
     return this;
+  }
+
+  private setUniqueOperationIds(document: { paths?: Record<string, Record<string, any>> }) {
+    const usedOperationIds = new Set<string>();
+
+    for (const [path, pathItem] of Object.entries(document.paths ?? {})) {
+      for (const [httpMethod, operation] of Object.entries(pathItem ?? {})) {
+        if (!this.httpMethods.has(httpMethod) || !operation || typeof operation !== 'object') {
+          continue;
+        }
+
+        const normalizedPath = path
+          .replace(/[{}]/g, '')
+          .replace(/[^a-zA-Z0-9]+/g, '_')
+          .replace(/^_+|_+$/g, '');
+
+        const baseOperationId = `${httpMethod}_${normalizedPath || 'root'}`;
+        let operationId = baseOperationId;
+        let duplicateCounter = 2;
+
+        while (usedOperationIds.has(operationId)) {
+          operationId = `${baseOperationId}_${duplicateCounter}`;
+          duplicateCounter += 1;
+        }
+
+        operation.operationId = operationId;
+        usedOperationIds.add(operationId);
+      }
+    }
   }
 
   public async build(): Promise<INestApplication> {
@@ -77,6 +107,7 @@ export class FsArchAppBuilder {
           .setVersion(version)
           .build();
         const document = SwaggerModule.createDocument(app, config);
+        this.setUniqueOperationIds(document);
         SwaggerModule.setup(path ?? 'docs', app, document);
       }
     }

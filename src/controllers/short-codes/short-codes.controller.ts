@@ -8,7 +8,7 @@ import {
   Patch,
   Body,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ShortCodeService } from '../../repositories/short-code/short-code.service.js';
 import {
   ShortCodeDto,
@@ -16,6 +16,7 @@ import {
 } from '../../models/short-code.model.js';
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { ShortCodeType } from '../../constants/short-code-type.enum.js';
+import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('short-code')
 @Controller({
@@ -32,21 +33,7 @@ export class ShortCodesController {
   }
 
   @Get()
-  @ApiOkResponse({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginationResultDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(ShortCodeDto) },
-            },
-          },
-        },
-      ],
-    },
-  })
+  @ApiOkPaginatedResponse(ShortCodeDto)
   @ApiQuery({
     name: 'shortCodeTypeId',
     required: false,

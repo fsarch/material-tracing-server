@@ -10,7 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 import { PartService } from '../../repositories/part/part.service.js';
 import { PartShortCodeService } from '../../repositories/part-short-code/part-short-code.service.js';
@@ -27,6 +27,7 @@ import { EEvent } from '../../constants/event.enum.js';
 import { MaterialService } from '../../repositories/material/material.service.js';
 import { PartMaterialService } from '../../repositories/part-material/part-material.service.js';
 import { PartPartService } from '../../repositories/part-part/part-part.service.js';
+import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('parts')
 @Controller({
@@ -90,21 +91,7 @@ export class PartsController {
     required: false,
     description: "Embed related resources. Supported values: 'availableAmount', 'shortCodes'",
   })
-  @ApiOkResponse({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginationResultDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(PartDto) },
-            },
-          },
-        },
-      ],
-    },
-  })
+  @ApiOkPaginatedResponse(PartDto)
   public async List(
     @Query('skip') skip?: number,
     @Query('take') take?: number,

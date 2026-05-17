@@ -8,7 +8,7 @@ import {
   Patch,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   MaterialTypeCreateDto,
   MaterialTypeDto,
@@ -18,6 +18,7 @@ import { MaterialTypeService } from '../../repositories/material-type/material-t
 import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
+import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('material-type')
 @Controller({
@@ -36,21 +37,7 @@ export class MaterialTypesController {
   }
 
   @Get()
-  @ApiOkResponse({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginationResultDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(MaterialTypeDto) },
-            },
-          },
-        },
-      ],
-    },
-  })
+  @ApiOkPaginatedResponse(MaterialTypeDto)
   @ApiQuery({
     name: 'isArchived',
     type: Boolean,
