@@ -10,7 +10,15 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 import { PartService } from '../../repositories/part/part.service.js';
 import { PartShortCodeService } from '../../repositories/part-short-code/part-short-code.service.js';
@@ -190,6 +198,8 @@ export class PartsController {
   }
 
   @Get('/:partId')
+  @ApiOkResponse({ type: PartDto })
+  @ApiNotFoundResponse({ description: 'Part not found' })
   @ApiQuery({
     name: 'embed',
     isArray: true,
@@ -215,6 +225,16 @@ export class PartsController {
   }
 
   @Post()
+  @ApiCreatedResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+      },
+      required: ['id'],
+    },
+  })
+  @ApiNotFoundResponse({ description: 'Referenced part type/material/part not found' })
   public async Create(@Body() partCreateDto: PartCreateDto) {
     const materials = partCreateDto.materials ?? [];
     const childParts = partCreateDto.parts ?? [];
@@ -277,28 +297,32 @@ export class PartsController {
   }
 
   @Patch('/:partId')
+  @ApiOkResponse({ description: 'Part updated' })
+  @ApiNotFoundResponse({ description: 'Part not found' })
   public async Update(
     @Param('partId') partId: string,
     @Body() partPatchDto: PartPatchDto,
-  ) {
+  ): Promise<void> {
     const part = await this.partService.GetById(partId);
 
     if (!part) {
       throw new NotFoundException();
     }
 
-    return await this.partService.UpdatePart(partId, partPatchDto);
+    await this.partService.UpdatePart(partId, partPatchDto);
   }
 
   @Delete('/:partId')
-  public async Delete(@Param('partId') partId: string) {
+  @ApiNoContentResponse({ description: 'Part deleted' })
+  @ApiNotFoundResponse({ description: 'Part not found' })
+  public async Delete(@Param('partId') partId: string): Promise<void> {
     const part = await this.partService.GetById(partId);
 
     if (!part) {
       throw new NotFoundException();
     }
 
-    return await this.partService.DeletePart(partId);
+    await this.partService.DeletePart(partId);
   }
 
   @OnEvent(EEvent.DELETE_PART_TYPE)
