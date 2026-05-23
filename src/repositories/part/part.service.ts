@@ -52,6 +52,10 @@ export class PartService {
       part.amount = patchDto.amount;
     }
 
+    if (patchDto.partTypeId !== undefined) {
+      part.partTypeId = patchDto.partTypeId;
+    }
+
     if (patchDto.externalId !== undefined) {
       part.externalId = patchDto.externalId;
     }

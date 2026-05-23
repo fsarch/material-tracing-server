@@ -57,6 +57,10 @@ export class PartPatchDto {
 
   @ApiProperty()
   @IsOptional()
+  partTypeId?: string;
+
+  @ApiProperty()
+  @IsOptional()
   amount?: number;
 
   @ApiProperty()

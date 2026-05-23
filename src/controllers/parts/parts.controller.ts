@@ -309,6 +309,13 @@ export class PartsController {
       throw new NotFoundException();
     }
 
+    if (partPatchDto.partTypeId !== undefined) {
+      const partType = await this.partTypeService.GetPartType(partPatchDto.partTypeId);
+      if (!partType) {
+        throw new NotFoundException();
+      }
+    }
+
     await this.partService.UpdatePart(partId, partPatchDto);
   }
 
