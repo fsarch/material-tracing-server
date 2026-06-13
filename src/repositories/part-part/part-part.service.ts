@@ -41,10 +41,34 @@ export class PartPartService {
     };
   }
 
+  public async SetAmount(
+    partId: string,
+    childPartId: string,
+    amount: number,
+  ): Promise<{ id: string } | null> {
+    const existingPartChild = await this.partChildrenRepository.findOneBy({
+      partId,
+      childPartId,
+    });
+
+    if (!existingPartChild) {
+      return null;
+    }
+
+    existingPartChild.amount = amount;
+    const savedPartChild = await this.partChildrenRepository.save(
+      existingPartChild,
+    );
+
+    return {
+      id: savedPartChild.id,
+    };
+  }
+
   public async GetById(
     partId: string,
     childPartId: string,
-  ): Promise<PartChildren> {
+  ): Promise<PartChildren | null> {
     return await this.partChildrenRepository.findOne({
       where: {
         partId,

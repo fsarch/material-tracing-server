@@ -5,6 +5,11 @@ export class PartPartCreateDto {
   amount: number;
 }
 
+export class PartPartPatchDto {
+  @ApiProperty()
+  amount: number;
+}
+
 export class PartPartLinkDto {
   @ApiProperty()
   id: string;
