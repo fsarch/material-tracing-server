@@ -14,9 +14,8 @@ import {
   ShortCodeDto,
   ShortCodeUpdateDto,
 } from '../../models/short-code.model.js';
-import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { ShortCodeType } from '../../constants/short-code-type.enum.js';
-import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
+import { ApiOkPaginatedResponse, type PaginationResultDto } from '@fsarch/server/pagination';
 
 @ApiTags('short-code')
 @Controller({

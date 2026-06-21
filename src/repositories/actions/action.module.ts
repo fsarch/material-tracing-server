@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ActionService } from './action.service.js';
-import { ModuleConfiguration } from '../../fsarch/configuration/module/module-configuration.module.js';
+import { ModuleConfiguration } from '@fsarch/server/configuration';
 import Joi from 'joi';
 
 const CUSTOM_ACTIONS_SERVER_CONFIG_VALIDATOR = Joi.array().items(

@@ -10,13 +10,12 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ManufacturerService } from '../../repositories/manufacturer/manufacturer.service.js';
-import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import {
   ManufacturerCreateDto,
   ManufacturerDto,
   ManufacturerUpdateDto,
 } from '../../models/manufacturer.model.js';
-import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
+import { ApiOkPaginatedResponse, PaginationResultDto } from '@fsarch/server/pagination';
 
 @ApiTags('manufacturers')
 @Controller({

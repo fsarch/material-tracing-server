@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MaterialService } from '../../repositories/material/material.service.js';
-import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import {
   MaterialCreateDto,
   MaterialDto,
@@ -20,7 +19,7 @@ import {
 import { MaterialTypeService } from '../../repositories/material-type/material-type.service.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
-import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
+import { ApiOkPaginatedResponse, PaginationResultDto } from '@fsarch/server/pagination';
 
 @ApiTags('material')
 @Controller({

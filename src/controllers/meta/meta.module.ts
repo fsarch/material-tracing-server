@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MetaController } from './meta.controller.js';
-import { ModuleConfiguration } from '../../fsarch/configuration/module/module-configuration.module.js';
+import { ModuleConfiguration } from '@fsarch/server/configuration';
 import Joi from 'joi';
 import { ActionModule } from '../../repositories/actions/action.module.js';
 

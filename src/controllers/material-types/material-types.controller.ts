@@ -15,10 +15,9 @@ import {
   MaterialTypeUpdateDto,
 } from '../../models/material-type.model.js';
 import { MaterialTypeService } from '../../repositories/material-type/material-type.service.js';
-import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
+import { PaginationResultDto, ApiOkPaginatedResponse } from '@fsarch/server/pagination';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
-import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
 
 @ApiTags('material-type')
 @Controller({

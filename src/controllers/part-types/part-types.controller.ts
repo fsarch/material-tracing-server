@@ -16,8 +16,7 @@ import {
   PartTypePatchDto,
 } from '../../models/part-type.model.js';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
-import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
-import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
+import { ApiOkPaginatedResponse, PaginationResultDto } from '@fsarch/server/pagination';
 
 @ApiTags('part-types')
 @Controller({

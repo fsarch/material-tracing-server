@@ -5,8 +5,8 @@ import {
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
-import { ModuleConfigurationService } from '../../fsarch/configuration/module/module-configuration.service.js';
-import { User } from '../../fsarch/auth/user.js';
+import { ModuleConfigurationService } from '@fsarch/server/configuration';
+import { User } from '@fsarch/server/auth';
 
 type TCustomActionConfig = {
   id: string;

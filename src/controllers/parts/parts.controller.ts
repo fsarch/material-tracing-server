@@ -29,13 +29,12 @@ import {
   PartPatchDto,
 } from '../../models/part.model.js';
 import { ShortCodeDto } from '../../models/short-code.model.js';
-import { PaginationResultDto } from '../../fsarch/pagination/pagination-result.dto.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
 import { MaterialService } from '../../repositories/material/material.service.js';
 import { PartMaterialService } from '../../repositories/part-material/part-material.service.js';
 import { PartPartService } from '../../repositories/part-part/part-part.service.js';
-import { ApiOkPaginatedResponse } from '../../fsarch/pagination/api-ok-paginated-response.decorator.js';
+import { ApiOkPaginatedResponse, type PaginationResultDto } from '@fsarch/server/pagination';
 
 @ApiTags('parts')
 @Controller({
