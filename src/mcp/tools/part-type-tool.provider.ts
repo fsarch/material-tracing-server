@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { Tool } from '@rekog/mcp-nest';
+import { McpController, Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 
 type ResourceStatus = 'all' | 'active' | 'archived';
 
-@Injectable()
+@McpController()
 export class PartTypeToolProvider {
   constructor(private readonly partTypeService: PartTypeService) {}
 

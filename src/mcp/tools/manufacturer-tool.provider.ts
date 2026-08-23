@@ -1,10 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Tool } from '@rekog/mcp-nest';
+import { McpController, Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 import { ManufacturerService } from '../../repositories/manufacturer/manufacturer.service.js';
 
-@Injectable()
-
+@McpController()
 export class ManufacturerToolProvider {
   constructor(private readonly manufacturerService: ManufacturerService) {}
 

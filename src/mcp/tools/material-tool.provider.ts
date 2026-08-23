@@ -1,12 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { Tool } from '@rekog/mcp-nest';
+import { McpController, Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 import { MaterialService } from '../../repositories/material/material.service.js';
 
 type ResourceStatus = 'all' | 'active' | 'archived' | 'checked-out';
 
-@Injectable()
-
+@McpController()
 export class MaterialToolProvider {
   constructor(private readonly materialService: MaterialService) {}
 

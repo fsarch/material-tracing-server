@@ -1,10 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Tool } from '@rekog/mcp-nest';
+import { McpController, Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 import { ShortCodeService } from '../../repositories/short-code/short-code.service.js';
 
-@Injectable()
-
+@McpController()
 export class ShortCodeToolProvider {
   constructor(private readonly shortCodeService: ShortCodeService) {}
 
