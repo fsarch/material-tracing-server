@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { type Mocked, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { MaterialShortCodesController } from './short-codes.controller.js';
@@ -9,8 +9,8 @@ import { ShortCodeType } from '../../../constants/short-code-type.enum.js';
 
 describe('MaterialShortCodesController', () => {
   let controller: MaterialShortCodesController;
-  let shortCodeService: jest.Mocked<ShortCodeService>;
-  let materialShortCodeService: jest.Mocked<MaterialShortCodeService>;
+  let shortCodeService: Mocked<ShortCodeService>;
+  let materialShortCodeService: Mocked<MaterialShortCodeService>;
 
   const mockMaterialShortCode = {
     id: 'msc-1',
@@ -31,15 +31,15 @@ describe('MaterialShortCodesController', () => {
 
   beforeEach(async () => {
     const mockShortCodeService = {
-      GetShortCodeByCode: jest.fn(),
-      CheckShortCodeConnection: jest.fn(),
-      UpdateShortCode: jest.fn(),
+      GetShortCodeByCode: vi.fn(),
+      CheckShortCodeConnection: vi.fn(),
+      UpdateShortCode: vi.fn(),
     };
 
     const mockMaterialShortCodeService = {
-      ListByMaterialId: jest.fn(),
-      Create: jest.fn(),
-      DeleteById: jest.fn(),
+      ListByMaterialId: vi.fn(),
+      Create: vi.fn(),
+      DeleteById: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -66,7 +66,7 @@ describe('MaterialShortCodesController', () => {
 
   describe('MapMaterialShortCode', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it('should successfully map a short code to a material when no conflicts exist', async () => {

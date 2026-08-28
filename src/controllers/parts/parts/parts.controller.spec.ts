@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { type Mock, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartsController } from './parts.controller.js';
 import { PartService } from '../../../repositories/part/part.service.js';
@@ -6,21 +6,21 @@ import { PartPartService } from '../../../repositories/part-part/part-part.servi
 
 describe('PartsController', () => {
   let controller: PartsController;
-  let partService: { GetById: jest.Mock };
+  let partService: { GetById: Mock };
   let partPartService: {
-    DeleteByPartId: jest.Mock;
-    GetById: jest.Mock;
-    SetAmount: jest.Mock;
+    DeleteByPartId: Mock;
+    GetById: Mock;
+    SetAmount: Mock;
   };
 
   beforeEach(async () => {
     partPartService = {
-      DeleteByPartId: jest.fn(),
-      GetById: jest.fn(),
-      SetAmount: jest.fn(),
+      DeleteByPartId: vi.fn(),
+      GetById: vi.fn(),
+      SetAmount: vi.fn(),
     };
     partService = {
-      GetById: jest.fn(),
+      GetById: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -61,8 +61,8 @@ describe('PartsController', () => {
     const childLink = { id: 'link-id', amount: 3 };
 
     partService.GetById.mockResolvedValue({ id: 'parent-part-id' });
-    (partPartService.GetById as jest.Mock).mockResolvedValue(childLink);
-    (partPartService.SetAmount as jest.Mock).mockResolvedValue({
+    (partPartService.GetById as Mock).mockResolvedValue(childLink);
+    (partPartService.SetAmount as Mock).mockResolvedValue({
       id: 'link-id',
     });
 

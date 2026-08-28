@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { type Mock, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PartChildren } from '../../database/entities/part_children.entity.js';
@@ -7,14 +7,14 @@ import { PartPartService } from './part-part.service.js';
 describe('PartPartService', () => {
   let service: PartPartService;
   let repository: {
-    findOneBy: jest.Mock;
-    save: jest.Mock;
+    findOneBy: Mock;
+    save: Mock;
   };
 
   beforeEach(async () => {
     repository = {
-      findOneBy: jest.fn(),
-      save: jest.fn(),
+      findOneBy: vi.fn(),
+      save: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

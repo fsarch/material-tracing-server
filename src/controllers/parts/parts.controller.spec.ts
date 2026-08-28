@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { type Mocked, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartsController } from './parts.controller.js';
 import { PartService } from '../../repositories/part/part.service.js';
@@ -7,8 +7,8 @@ import { PartDto } from '../../models/part.model.js';
 
 describe('PartsController', () => {
   let controller: PartsController;
-  let partService: jest.Mocked<PartService>;
-  let partTypeService: jest.Mocked<PartTypeService>;
+  let partService: Mocked<PartService>;
+  let partTypeService: Mocked<PartTypeService>;
 
   const mockParts = [
     {
@@ -51,17 +51,17 @@ describe('PartsController', () => {
 
   beforeEach(async () => {
     const mockPartService = {
-      ListParts: jest.fn(),
-      GetById: jest.fn(),
-      CreatePart: jest.fn(),
-      UpdatePart: jest.fn(),
-      DeletePart: jest.fn(),
-      GetAvailableAmount: jest.fn(),
-      ListPartsByPartType: jest.fn(),
+      ListParts: vi.fn(),
+      GetById: vi.fn(),
+      CreatePart: vi.fn(),
+      UpdatePart: vi.fn(),
+      DeletePart: vi.fn(),
+      GetAvailableAmount: vi.fn(),
+      ListPartsByPartType: vi.fn(),
     };
 
     const mockPartTypeService = {
-      GetPartType: jest.fn(),
+      GetPartType: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
