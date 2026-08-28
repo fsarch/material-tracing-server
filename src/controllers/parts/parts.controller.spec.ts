@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartsController } from './parts.controller.js';
 import { PartService } from '../../repositories/part/part.service.js';

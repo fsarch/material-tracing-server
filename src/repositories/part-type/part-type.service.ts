@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository, Not } from 'typeorm';
 import {
   PartTypeCreateDto,
-  PartTypeDto,
   PartTypePatchDto,
 } from '../../models/part-type.model.js';
 import { PartType } from '../../database/entities/part_type.entity.js';
@@ -39,7 +38,7 @@ export class PartTypeService {
   public async ListPartTypes(
     isArchived: boolean = false,
     search?: string,
-  ): Promise<Array<PartTypeDto>> {
+  ): Promise<Array<PartType>> {
     const query = this.partTypeRepository.createQueryBuilder('part_type');
 
     // Apply archive filter
