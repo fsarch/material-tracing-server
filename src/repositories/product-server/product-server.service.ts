@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Joi from 'joi';
 import { User } from '@fsarch/server/auth';
+import { withSpan } from '@fsarch/server/tracing';
 
 type TProductServerConfig = {
   type: 'remote';
@@ -84,35 +85,47 @@ export class ProductServerService {
     productId: string,
     options: { user: User },
   ): Promise<boolean> {
-    const config = this.getConfig();
+    return withSpan(
+      'product-server.validate-product-exists',
+      async (span) => {
+        span.setAttribute('product.id', productId);
 
-    const url = new URL(
-      `/v1/catalogs/${config.catalog_id}/items/${productId}`,
-      config.url,
-    );
+        const config = this.getConfig();
 
-    const accessToken = options.user.getAccessToken();
+        const url = new URL(
+          `/v1/catalogs/${config.catalog_id}/items/${productId}`,
+          config.url,
+        );
 
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+        const accessToken = options.user.getAccessToken();
+
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        span.setAttribute('http.response.status_code', res.status);
+
+        if (res.status === 200) {
+          return true;
+        }
+
+        if (res.status === 404) {
+          return false;
+        }
+
+        this.logger.error(
+          'failed to validate product against product-server',
+          {
+            status: res.status,
+          },
+        );
+
+        throw new Error(
+          `Unexpected response from product-server (status ${res.status})`,
+        );
       },
-    });
-
-    if (res.status === 200) {
-      return true;
-    }
-
-    if (res.status === 404) {
-      return false;
-    }
-
-    this.logger.error('failed to validate product against product-server', {
-      status: res.status,
-    });
-
-    throw new Error(
-      `Unexpected response from product-server (status ${res.status})`,
     );
   }
 }

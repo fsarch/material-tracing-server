@@ -11,6 +11,7 @@ import { EEvent } from '../../constants/event.enum.js';
 import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
 import { ProductServerService } from '../product-server/product-server.service.js';
 import { User } from '@fsarch/server/auth';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class PartTypeService {
@@ -21,6 +22,7 @@ export class PartTypeService {
     private readonly productServerService: ProductServerService,
   ) {}
 
+  @Span({ name: 'part-type.create' })
   public async CreatePartType(
     createDto: PartTypeCreateDto,
     options: { user: User },
@@ -100,6 +102,7 @@ export class PartTypeService {
     });
   }
 
+  @Span({ name: 'part-type.update' })
   public async UpdatePartType(
     id: string,
     partTypePatchDto: PartTypePatchDto,
