@@ -101,4 +101,42 @@ describe('ProductServerService', () => {
       ).rejects.toThrow('invalid product_server config');
     });
   });
+
+  describe('listItems', () => {
+    it('returns an empty list when no product_server config section is present (app runs without product-server)', async () => {
+      configGetMock.mockReturnValue(undefined);
+
+      await expect(service.listItems({ user })).resolves.toEqual([]);
+
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns the mapped item list when product-server responds with 200', async () => {
+      fetchMock.mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve([
+            { id: 'item-1', name: 'Item 1', irrelevant: 'field' },
+            { id: 'item-2', name: 'Item 2' },
+          ]),
+      });
+
+      await expect(service.listItems({ user })).resolves.toEqual([
+        { id: 'item-1', name: 'Item 1' },
+        { id: 'item-2', name: 'Item 2' },
+      ]);
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        new URL('http://product-server.local/v1/catalogs/catalog-id/items'),
+        { headers: { Authorization: 'Bearer test-token' } },
+      );
+    });
+
+    it('throws when product-server responds with an unexpected status', async () => {
+      fetchMock.mockResolvedValue({ ok: false, status: 500 });
+
+      await expect(service.listItems({ user })).rejects.toThrow();
+    });
+  });
 });

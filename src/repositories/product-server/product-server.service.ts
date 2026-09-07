@@ -128,4 +128,51 @@ export class ProductServerService {
       },
     );
   }
+
+  /**
+   * Lists all items in the configured catalog, for use as a picker (e.g. a
+   * searchable select in the dashboard). Fails open when product-server
+   * isn't configured - the caller then just has an empty list to choose
+   * from, instead of the whole feature blowing up.
+   */
+  public async listItems(
+    options: { user: User },
+  ): Promise<Array<{ id: string; name: string }>> {
+    return withSpan('product-server.list-items', async (span) => {
+      if (!this.isConfigured()) {
+        return [];
+      }
+
+      const config = this.getConfig();
+
+      const url = new URL(
+        `/v1/catalogs/${config.catalog_id}/items`,
+        config.url,
+      );
+
+      const accessToken = options.user.getAccessToken();
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      span.setAttribute('http.response.status_code', res.status);
+
+      if (!res.ok) {
+        this.logger.error('failed to list items from product-server', {
+          status: res.status,
+        });
+
+        throw new Error(
+          `Unexpected response from product-server (status ${res.status})`,
+        );
+      }
+
+      const items = (await res.json()) as Array<{ id: string; name: string }>;
+
+      return items.map((item) => ({ id: item.id, name: item.name }));
+    });
+  }
 }
