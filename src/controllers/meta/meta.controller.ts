@@ -2,6 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ActionService } from '../../repositories/actions/action.service.js';
+import { ProductServerService } from '../../repositories/product-server/product-server.service.js';
 
 @ApiTags('.meta')
 @Controller({
@@ -13,6 +14,7 @@ export class MetaController {
   constructor(
     private readonly configService: ConfigService,
     private readonly actionsService: ActionService,
+    private readonly productServerService: ProductServerService,
   ) {}
 
   @Get('user-interface')
@@ -27,6 +29,7 @@ export class MetaController {
         adminUrl: imageConfig.admin_url,
         userUrl: imageConfig.user_url,
       },
+      productServer: this.productServerService.getPublicConfig(),
       customActions:
         await this.actionsService.getPublicCustomActionDefinition(),
     };

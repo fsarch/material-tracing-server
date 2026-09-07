@@ -3,6 +3,7 @@ import { MetaController } from './meta.controller.js';
 import { ModuleConfiguration } from '@fsarch/server/configuration';
 import Joi from 'joi';
 import { ActionModule } from '../../repositories/actions/action.module.js';
+import { ProductServerModule } from '../../repositories/product-server/product-server.module.js';
 
 const IMAGE_SERVER_CONFIG_VALIDATOR = Joi.object({
   type: Joi.string().valid('remote').required(),
@@ -18,6 +19,7 @@ const IMAGE_SERVER_CONFIG_VALIDATOR = Joi.object({
       name: 'images',
     }),
     ActionModule,
+    ProductServerModule,
   ],
 })
 export class MetaModule {}

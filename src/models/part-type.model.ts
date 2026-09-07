@@ -9,6 +9,13 @@ export class PartTypeCreateDto {
   @ApiProperty()
   externalId: string;
 
+  @ApiProperty({
+    required: false,
+    description: 'ID of the linked product in product-server',
+  })
+  @IsOptional()
+  productId?: string;
+
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
@@ -29,6 +36,13 @@ export class PartTypePatchDto {
   })
   externalId?: string;
 
+  @ApiProperty({
+    required: false,
+    description: 'ID of the linked product in product-server',
+  })
+  @IsOptional()
+  productId?: string;
+
   @ApiProperty({ required: false })
   @IsOptional()
   hint?: string;
@@ -45,6 +59,7 @@ export class PartTypeDto {
     partTypeDto.id = partType.id;
     partTypeDto.name = partType.name;
     partTypeDto.externalId = partType.externalId;
+    partTypeDto.productId = partType.productId;
     partTypeDto.hint = partType.hint;
     partTypeDto.archiveTime = partType.archiveTime;
 
@@ -59,6 +74,9 @@ export class PartTypeDto {
 
   @ApiProperty()
   externalId: string;
+
+  @ApiProperty({ required: false })
+  productId?: string | null;
 
   @ApiProperty({ required: false })
   hint?: string;

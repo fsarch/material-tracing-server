@@ -92,6 +92,13 @@ export class PartsController {
     description: 'Filter parts by partTypeId (UUID). If provided, only parts with this partTypeId are returned.',
   })
   @ApiQuery({
+    name: 'productId',
+    type: String,
+    required: false,
+    description:
+      'Filter parts by the linked product-server product ID of their part type (transitive via partTypeId).',
+  })
+  @ApiQuery({
     name: 'embed',
     isArray: true,
     type: String,
@@ -106,6 +113,7 @@ export class PartsController {
     @Query('search') search?: string,
     @Query('isArchived') isArchived?: boolean,
     @Query('partTypeId') partTypeId?: string,
+    @Query('productId') productId?: string,
     @Query('embed') embed: Array<string> = [],
   ): Promise<PaginationResultDto<PartDto>> {
     // Set default take value to 25 if not provided
@@ -117,6 +125,7 @@ export class PartsController {
       name,
       search,
       partTypeId,
+      productId,
     });
 
     const totalItems = allParts.length;
@@ -129,6 +138,7 @@ export class PartsController {
       search,
       isArchived: isArchived ?? false,
       partTypeId,
+      productId,
     });
 
     const data = parts.map(PartDto.FromDbo);

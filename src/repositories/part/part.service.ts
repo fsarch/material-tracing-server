@@ -82,6 +82,7 @@ export class PartService {
     isArchived?: boolean;
     search?: string;
     partTypeId?: string;
+    productId?: string;
   }): Promise<Array<Part>> {
     const query = this.partRepository.createQueryBuilder('part');
 
@@ -125,6 +126,14 @@ export class PartService {
       query.andWhere('part.part_type_id = :partTypeId', {
         partTypeId: options.partTypeId,
       });
+    }
+
+    // Apply explicit productId filter if provided (transitively via part_type)
+    if (options.productId !== undefined && options.productId !== '') {
+      query.andWhere(
+        'part.part_type_id IN (SELECT id FROM part_type WHERE product_id = :productId)',
+        { productId: options.productId },
+      );
     }
 
     if (options.skip !== undefined) {

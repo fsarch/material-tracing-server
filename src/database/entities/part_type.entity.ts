@@ -29,6 +29,14 @@ export class PartType {
   })
   externalId: string;
 
+  @Column({
+    name: 'product_id',
+    type: 'varchar',
+    length: '256',
+    nullable: true,
+  })
+  productId: string | null = null;
+
   @CreateDateColumn({
     name: 'creation_time',
   })

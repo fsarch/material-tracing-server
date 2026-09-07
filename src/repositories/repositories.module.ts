@@ -10,6 +10,7 @@ import { PartShortCodeModule } from './part-short-code/part-short-code.module.js
 import { PartMaterialModule } from './part-material/part-material.module.js';
 import { PartPartModule } from './part-part/part-part.module.js';
 import { ActionModule } from './actions/action.module.js';
+import { ProductServerModule } from './product-server/product-server.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ActionModule } from './actions/action.module.js';
     PartMaterialModule,
     PartPartModule,
     ActionModule,
+    ProductServerModule,
   ],
 })
 export class RepositoriesModule {}

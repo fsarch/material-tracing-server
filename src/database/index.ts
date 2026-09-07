@@ -14,6 +14,7 @@ import { PartAmount1748372988976 } from "./migrations/1748372988976-part-amount.
 import { CheckoutTime1749376805136 } from "./migrations/1749376805136-checkout-time.js";
 import { AddHintFields1753046680101 } from "./migrations/1753046680101-add-hint-fields.js";
 import { AddArchiveTime1766219951021 } from "./migrations/1766219951021-add-archive-time.js";
+import { AddProductIdToPartType1788725363259 } from "./migrations/1788725363259-add-product-id-to-part-type.js";
 
 export const DATABASE_OPTIONS = {
   entities: [
@@ -35,5 +36,6 @@ export const DATABASE_OPTIONS = {
     CheckoutTime1749376805136,
     AddHintFields1753046680101,
     AddArchiveTime1766219951021,
+    AddProductIdToPartType1788725363259,
   ],
 };

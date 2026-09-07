@@ -17,6 +17,7 @@ import {
 } from '../../models/part-type.model.js';
 import { PartTypeService } from '../../repositories/part-type/part-type.service.js';
 import { ApiOkPaginatedResponse, PaginationResultDto } from '@fsarch/server/pagination';
+import { UserData, User } from '@fsarch/server/auth';
 
 @ApiTags('part-types')
 @Controller({
@@ -28,8 +29,13 @@ export class PartTypesController {
   constructor(private readonly partTypeService: PartTypeService) {}
 
   @Post()
-  public async Create(@Body() partTypeCreateDto: PartTypeCreateDto) {
-    return await this.partTypeService.CreatePartType(partTypeCreateDto);
+  public async Create(
+    @Body() partTypeCreateDto: PartTypeCreateDto,
+    @UserData() user: User,
+  ) {
+    return await this.partTypeService.CreatePartType(partTypeCreateDto, {
+      user,
+    });
   }
 
   @Get()
@@ -46,17 +52,26 @@ export class PartTypesController {
     required: false,
     description: 'Search by name (case-insensitive) or externalId',
   })
+  @ApiQuery({
+    name: 'productId',
+    type: String,
+    required: false,
+    description:
+      'Filter by the linked product-server product ID (exact match)',
+  })
   public async List(
     @Query('skip') skip?: number,
     @Query('take') take?: number,
     @Query('isArchived') isArchived?: boolean,
     @Query('search') search?: string,
+    @Query('productId') productId?: string,
   ): Promise<PaginationResultDto<PartTypeDto>> {
     const takeValue = take ?? 25;
 
     const all = await this.partTypeService.ListPartTypes(
       isArchived ?? false,
       search,
+      productId,
     );
 
     const totalItems = all.length;
@@ -93,6 +108,7 @@ export class PartTypesController {
   public async Update(
     @Param('partTypeId') partTypeId: string,
     @Body() partTypePatchDto: PartTypePatchDto,
+    @UserData() user: User,
   ) {
     const part = await this.partTypeService.GetPartType(partTypeId);
 
@@ -103,6 +119,7 @@ export class PartTypesController {
     return await this.partTypeService.UpdatePartType(
       partTypeId,
       partTypePatchDto,
+      { user },
     );
   }
 
