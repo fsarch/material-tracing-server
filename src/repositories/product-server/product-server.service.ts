@@ -22,6 +22,13 @@ const PRODUCT_SERVER_CONFIG_VALIDATOR = Joi.object({
   }).required(),
 });
 
+type TProductItem = { id: string; name: string };
+
+type TItemsCacheEntry = {
+  data: Array<TProductItem>;
+  fetchedAt: number;
+};
+
 /**
  * The `product_server` config section is optional: instances that don't use
  * the product-server integration can omit it entirely and simply never set
@@ -33,6 +40,21 @@ const PRODUCT_SERVER_CONFIG_VALIDATOR = Joi.object({
 @Injectable()
 export class ProductServerService {
   private readonly logger = new Logger(ProductServerService.name);
+
+  /**
+   * Stale-while-revalidate cache for listItems(): a cache hit younger than
+   * ITEMS_CACHE_FRESH_MS is returned as-is; between that and
+   * ITEMS_CACHE_MAX_STALE_MS it's still returned immediately, but a
+   * background refresh is kicked off; beyond that it's treated as a miss
+   * and the caller blocks on a fresh fetch. Deliberately a single,
+   * process-global entry rather than per-user: the catalog itself is the
+   * same for every user, only the bearer token used to fetch it differs.
+   */
+  private static readonly ITEMS_CACHE_FRESH_MS = 60_000;
+  private static readonly ITEMS_CACHE_MAX_STALE_MS = 10 * 60_000;
+
+  private itemsCache: TItemsCacheEntry | null = null;
+  private itemsFetchInFlight: Promise<Array<TProductItem>> | null = null;
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -134,46 +156,103 @@ export class ProductServerService {
    * searchable select in the dashboard). Fails open when product-server
    * isn't configured - the caller then just has an empty list to choose
    * from, instead of the whole feature blowing up.
+   *
+   * Backed by the stale-while-revalidate cache described on
+   * ITEMS_CACHE_FRESH_MS / ITEMS_CACHE_MAX_STALE_MS above, since the
+   * upstream call is slow and the catalog doesn't change often.
    */
   public async listItems(
     options: { user: User },
-  ): Promise<Array<{ id: string; name: string }>> {
+  ): Promise<Array<TProductItem>> {
     return withSpan('product-server.list-items', async (span) => {
       if (!this.isConfigured()) {
         this.logger.debug('product-server not configured');
         return [];
       }
 
-      const config = this.getConfig();
+      const cached = this.itemsCache;
 
-      const url = new URL(
-        `/v1/catalogs/${config.catalog_id}/items`,
-        config.url,
-      );
+      if (cached) {
+        const age = Date.now() - cached.fetchedAt;
+        span.setAttribute('cache.hit', true);
+        span.setAttribute('cache.age_ms', age);
 
-      const accessToken = options.user.getAccessToken();
+        if (age <= ProductServerService.ITEMS_CACHE_MAX_STALE_MS) {
+          if (age > ProductServerService.ITEMS_CACHE_FRESH_MS) {
+            // Stale but still usable: serve it now, refresh in the background.
+            this.fetchAndCacheItems(options).catch((error: unknown) => {
+              this.logger.warn(
+                'background refresh of product-server items cache failed, keeping stale data',
+                { error: error instanceof Error ? error.message : error },
+              );
+            });
+          }
 
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      span.setAttribute('http.response.status_code', res.status);
-
-      if (!res.ok) {
-        this.logger.error('failed to list items from product-server', {
-          status: res.status,
-        });
-
-        throw new Error(
-          `Unexpected response from product-server (status ${res.status})`,
-        );
+          return cached.data;
+        }
+      } else {
+        span.setAttribute('cache.hit', false);
       }
 
-      const items = (await res.json()) as Array<{ id: string; name: string }>;
-
-      return items.map((item) => ({ id: item.id, name: item.name }));
+      // No cache, or too stale to serve: block on a fresh fetch.
+      return this.fetchAndCacheItems(options);
     });
+  }
+
+  /**
+   * Fetches the item list from product-server and updates the cache.
+   * Concurrent callers (be it two cold callers, or a cold caller racing a
+   * background revalidation) share the same in-flight request instead of
+   * each firing their own.
+   */
+  private fetchAndCacheItems(
+    options: { user: User },
+  ): Promise<Array<TProductItem>> {
+    if (this.itemsFetchInFlight) {
+      return this.itemsFetchInFlight;
+    }
+
+    this.itemsFetchInFlight = withSpan(
+      'product-server.list-items.fetch',
+      async (span) => {
+        const config = this.getConfig();
+
+        const url = new URL(
+          `/v1/catalogs/${config.catalog_id}/items`,
+          config.url,
+        );
+
+        const accessToken = options.user.getAccessToken();
+
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        span.setAttribute('http.response.status_code', res.status);
+
+        if (!res.ok) {
+          this.logger.error('failed to list items from product-server', {
+            status: res.status,
+          });
+
+          throw new Error(
+            `Unexpected response from product-server (status ${res.status})`,
+          );
+        }
+
+        const items = (await res.json()) as Array<TProductItem>;
+        const data = items.map((item) => ({ id: item.id, name: item.name }));
+
+        this.itemsCache = { data, fetchedAt: Date.now() };
+
+        return data;
+      },
+    ).finally(() => {
+      this.itemsFetchInFlight = null;
+    });
+
+    return this.itemsFetchInFlight;
   }
 }
