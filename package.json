@@ -31,7 +31,7 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "@fsarch/server": "^0.2.5",
+    "@fsarch/server": "^0.2.7",
     "@modelcontextprotocol/core": "^2.0.0",
     "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
@@ -42,7 +42,7 @@
     "@nestjs/microservices": "^12.0.1",
     "@nestjs/swagger": "^12.0.1",
     "@nestjs/typeorm": "^12.0.1",
-    "@rekog/mcp-nest": "^2.0.2",
+    "@rekog/mcp-nest": "^2.0.3",
     "class-validator": "^0.15.1",
     "joi": "^18.2.8",
     "nanoid": "^6.0.1",
@@ -58,8 +58,8 @@
     "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",
     "@types/supertest": "^7.2.1",
-    "@typescript-eslint/eslint-plugin": "^8.69.0",
-    "@typescript-eslint/parser": "^8.69.0",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
     "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
