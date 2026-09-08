@@ -9,6 +9,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
 import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class MaterialTypeService {
@@ -18,6 +19,7 @@ export class MaterialTypeService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  @Span({ name: 'material-type.create' })
   public async CreateMaterialType(createDto: MaterialTypeCreateDto) {
     const createdMaterialType = this.materialTypeRepository.create({
       id: crypto.randomUUID(),
@@ -81,6 +83,7 @@ export class MaterialTypeService {
     });
   }
 
+  @Span({ name: 'material-type.delete' })
   public async DeleteById(
     id: string,
     deletionTime: string = new Date().toISOString(),
@@ -101,6 +104,7 @@ export class MaterialTypeService {
     });
   }
 
+  @Span({ name: 'material-type.update' })
   public async UpdateMaterialType(
     id: string,
     updateDto: MaterialTypeUpdateDto,

@@ -140,6 +140,7 @@ export class ProductServerService {
   ): Promise<Array<{ id: string; name: string }>> {
     return withSpan('product-server.list-items', async (span) => {
       if (!this.isConfigured()) {
+        this.logger.debug('product-server not configured');
         return [];
       }
 

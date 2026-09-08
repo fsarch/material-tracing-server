@@ -9,6 +9,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
 import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class ManufacturerService {
@@ -18,6 +19,7 @@ export class ManufacturerService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  @Span({ name: 'manufacturer.create' })
   public async CreateManufacturer(createDto: ManufacturerCreateDto) {
     const createdManufacturer = this.manufacturerRepository.create({
       id: crypto.randomUUID(),
@@ -61,6 +63,7 @@ export class ManufacturerService {
     });
   }
 
+  @Span({ name: 'manufacturer.delete' })
   public async DeleteManufacturer(id: string) {
     const deletionTime = new Date();
 
@@ -80,6 +83,7 @@ export class ManufacturerService {
     });
   }
 
+  @Span({ name: 'manufacturer.update' })
   public async UpdateManufacturer(
     id: string,
     updateDto: ManufacturerUpdateDto,

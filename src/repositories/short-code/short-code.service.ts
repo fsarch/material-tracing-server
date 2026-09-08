@@ -12,6 +12,7 @@ import {
   ShortCodeUpdateDto,
 } from '../../models/short-code.model.js';
 import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
+import { Span } from '@fsarch/server/tracing';
 
 export const nolookalikesSafe = '346789ABCDEFGHJKLMNPQRTUVWXY';
 const nanoid = customAlphabet(nolookalikesSafe, 8);
@@ -37,6 +38,7 @@ export class ShortCodeService {
     private readonly partShortCodeRepository: Repository<PartShortCode>,
   ) {}
 
+  @Span({ name: 'short-code.create' })
   public async CreateShortCode() {
     const createdShortCode = this.shortCodeRepository.create({
       id: crypto.randomUUID(),
@@ -52,6 +54,7 @@ export class ShortCodeService {
     };
   }
 
+  @Span({ name: 'short-code.create-from-dto' })
   public async CreateShortCodeFromDto(createDto: ShortCodeCreateDto) {
     const createdShortCode = this.shortCodeRepository.create({
       id: crypto.randomUUID(),
@@ -105,6 +108,7 @@ export class ShortCodeService {
     });
   }
 
+  @Span({ name: 'short-code.update' })
   public async UpdateShortCode(
     id: string,
     updateDto: { shortCodeTypeId: ShortCodeType },
@@ -118,6 +122,7 @@ export class ShortCodeService {
     await this.shortCodeRepository.save(shortCode);
   }
 
+  @Span({ name: 'short-code.update-hint' })
   public async UpdateShortCodeHint(
     id: string,
     updateDto: ShortCodeUpdateDto,

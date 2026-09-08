@@ -7,6 +7,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EEvent } from '../../constants/event.enum.js';
 import { PartChildren } from '../../database/entities/part_children.entity.js';
 import { escapeSqlWildcards } from '../../utils/sql-search.utils.js';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class PartService {
@@ -18,6 +19,7 @@ export class PartService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  @Span({ name: 'part.create' })
   public async CreatePart(createDto: PartCreateDto) {
     const createdMaterial = this.partRepository.create({
       id: crypto.randomUUID(),
@@ -36,6 +38,7 @@ export class PartService {
     };
   }
 
+  @Span({ name: 'part.update' })
   public async UpdatePart(
     partId: string,
     patchDto: PartPatchDto,
@@ -213,6 +216,7 @@ export class PartService {
     });
   }
 
+  @Span({ name: 'part.delete' })
   public async DeletePart(
     id: string,
     deletionTime = new Date().toISOString(),

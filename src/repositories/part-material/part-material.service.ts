@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { PartMaterial } from '../../database/entities/part_material.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Material } from '../../database/entities/material.entity.js';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class PartMaterialService {
@@ -13,6 +14,7 @@ export class PartMaterialService {
     private readonly partMaterialRepository: Repository<PartMaterial>,
   ) {}
 
+  @Span({ name: 'part-material.create-or-get' })
   public async CreateOrGet(
     partId: string,
     materialId: string,
@@ -71,6 +73,7 @@ export class PartMaterialService {
     return existingPartMaterial;
   }
 
+  @Span({ name: 'part-material.delete' })
   public async DeleteById(partMaterialId: string): Promise<void> {
     await this.partMaterialRepository.softDelete({
       id: partMaterialId,

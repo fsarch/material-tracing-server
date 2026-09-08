@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ModuleConfigurationService } from '@fsarch/server/configuration';
 import { User } from '@fsarch/server/auth';
+import { withSpan } from '@fsarch/server/tracing';
 
 type TCustomActionConfig = {
   id: string;
@@ -59,42 +60,48 @@ export class ActionService {
       user: User;
     },
   ): Promise<{ success: true; result: unknown } | { success: false }> {
-    if (action.action.auth.type !== 'credential-propagation') {
-      throw new NotImplementedException();
-    }
+    return withSpan('action.execute', async (span) => {
+      span.setAttribute('action.id', action.id);
 
-    const accessToken = options.user.getAccessToken();
+      if (action.action.auth.type !== 'credential-propagation') {
+        throw new NotImplementedException();
+      }
 
-    const url = new URL(
-      `/v1/functions/${action.action.id}/executions?wait=true`,
-      action.action.server_url,
-    );
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        arguments: [payload],
-      }),
-    });
+      const accessToken = options.user.getAccessToken();
 
-    if (!res.ok) {
-      this.logger.error('failed to execute action', {
-        status: res.status,
+      const url = new URL(
+        `/v1/functions/${action.action.id}/executions?wait=true`,
+        action.action.server_url,
+      );
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          arguments: [payload],
+        }),
       });
+
+      span.setAttribute('http.response.status_code', res.status);
+
+      if (!res.ok) {
+        this.logger.error('failed to execute action', {
+          status: res.status,
+        });
+        return {
+          success: false,
+        };
+      }
+
+      const data = await res.json();
+
       return {
-        success: false,
+        success: true,
+        result: data.result,
       };
-    }
-
-    const data = await res.json();
-
-    return {
-      success: true,
-      result: data.result,
-    };
+    });
   }
 
   public async executePartAction(

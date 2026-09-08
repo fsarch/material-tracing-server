@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { PartShortCode } from '../../database/entities/part_short_code.entity.js';
 import * as crypto from 'node:crypto';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class PartShortCodeService {
@@ -11,6 +12,7 @@ export class PartShortCodeService {
     private readonly partShortCodeRepository: Repository<PartShortCode>,
   ) {}
 
+  @Span({ name: 'part-short-code.create' })
   public async Create(partId: string, shortCodeId: string) {
     const createdPartShortCode = this.partShortCodeRepository.create({
       id: crypto.randomUUID(),
@@ -50,6 +52,7 @@ export class PartShortCodeService {
     });
   }
 
+  @Span({ name: 'part-short-code.delete' })
   public async DeleteById(id: string): Promise<void> {
     await this.partShortCodeRepository.softDelete({
       id,

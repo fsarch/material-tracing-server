@@ -4,6 +4,7 @@ import { PartChildren } from '../../database/entities/part_children.entity.js';
 import { IsNull, Repository } from 'typeorm';
 import { Part } from '../../database/entities/part.entity.js';
 import { Material } from '../../database/entities/material.entity.js';
+import { Span } from '@fsarch/server/tracing';
 
 @Injectable()
 export class PartPartService {
@@ -12,6 +13,7 @@ export class PartPartService {
     private readonly partChildrenRepository: Repository<PartChildren>,
   ) {}
 
+  @Span({ name: 'part-part.get-or-add' })
   public async GetOrAdd(partId: string, childPartId: string, amount: number) {
     const existingPartChild = await this.partChildrenRepository.findOneBy({
       partId,
@@ -41,6 +43,7 @@ export class PartPartService {
     };
   }
 
+  @Span({ name: 'part-part.set-amount' })
   public async SetAmount(
     partId: string,
     childPartId: string,
@@ -92,12 +95,14 @@ export class PartPartService {
     return childParts;
   }
 
+  @Span({ name: 'part-part.delete' })
   public async DeleteById(partChildrenId: string) {
     await this.partChildrenRepository.softDelete({
       id: partChildrenId,
     });
   }
 
+  @Span({ name: 'part-part.delete-by-part-id' })
   public async DeleteByPartId(
     partId: string,
     deletionTime = new Date().toISOString(),
