@@ -1,4 +1,4 @@
-import { TCustomResourceDefinition } from '../custom-resources/custom-resources.types.js';
+import { TCustomResourceDefinition } from '@fsarch/server/custom-resource';
 
 function listRoute(
   path: string,
